@@ -1,20 +1,19 @@
+import "@ionic/react/css/core.css";
+
+import { setupIonicReact } from "@ionic/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { createRootRoute, Outlet } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/router-devtools";
+import { PropsWithChildren } from "react";
 
-export const Route = createRootRoute({
-  component: Root,
-});
+setupIonicReact();
 
 const queryClient = new QueryClient();
 
-function Root() {
+export default function Root({ children }: PropsWithChildren) {
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      {children}
       <ReactQueryDevtools initialIsOpen={false} />
-      <TanStackRouterDevtools />
     </QueryClientProvider>
   );
 }
