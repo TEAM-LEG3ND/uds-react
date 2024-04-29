@@ -93,7 +93,7 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!kakaoMapRef.current) return;
-    const dragendListener = async () => {
+    const boundsChangeListener = async () => {
       queryClient.cancelQueries({
         queryKey: ["spots", "current"],
       });
@@ -115,16 +115,16 @@ export default function HomePage() {
     };
     kakao.maps.event.addListener(
       kakaoMapRef.current,
-      "dragend",
-      dragendListener
+      "bounds_changed",
+      boundsChangeListener
     );
 
     return () => {
       if (!kakaoMapRef.current) return;
       kakao.maps.event.removeListener(
         kakaoMapRef.current,
-        "dragend",
-        dragendListener
+        "bounds_changed",
+        boundsChangeListener
       );
     };
   }, [queryClient, kakaoMapRef.current]);
