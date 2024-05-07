@@ -70,12 +70,13 @@ export default function Sheet({
   useLayoutEffect(() => {
     const openChanged = prevOpenRef.current !== open;
     if (!openChanged) return;
-    const hasAnimation =
-      !!stylesRef.current?.getPropertyValue("animation-name");
+    const noAnimation =
+      (stylesRef.current?.getPropertyValue("animation-name") || "none") ===
+      "none";
     if (open) {
       dispatch("MOUNT");
-    } else if (!hasAnimation) {
-      dispatch("ANIMATION_END");
+    } else if (noAnimation) {
+      dispatch("UNMOUNT");
     } else {
       dispatch("ANIMATION_OUT");
     }

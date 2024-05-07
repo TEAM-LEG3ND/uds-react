@@ -152,6 +152,3 @@ export default function HomePage() {
     </main>
   );
 }
-
-// 위치 클릭 시 상세 bottom sheet 띄우기
-// 위치 외에 클릭 시 bottom sheet 닫기
