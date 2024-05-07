@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { createPortal } from "react-dom";
+import { createPortal, flushSync } from "react-dom";
 
 import classNames from "./Sheet.module.css";
 
@@ -85,7 +85,9 @@ export default function Sheet({
   useEffect(() => {
     if (!sheet) return;
     const handleAnimationEnd = () => {
-      dispatch("ANIMATION_END");
+      flushSync(() => {
+        dispatch("ANIMATION_END");
+      });
     };
 
     sheet.addEventListener("animationend", handleAnimationEnd);
