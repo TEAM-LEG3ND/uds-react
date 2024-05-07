@@ -1,6 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 
+import Sheet from "@/components/Sheet/Sheet";
+import { useSheet } from "@/components/Sheet/Sheet.hooks";
 import classNames from "@/pages/index.module.css";
 import { Gym } from "@/types/models";
 
@@ -13,6 +15,7 @@ export default function HomePage() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const kakaoMapRef = useRef<kakao.maps.Map | null>(null);
   const queryClient = useQueryClient();
+  const { opened, toggle, close } = useSheet();
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
@@ -115,7 +118,7 @@ export default function HomePage() {
     };
     kakao.maps.event.addListener(
       kakaoMapRef.current,
-      "bounds_changed",
+      "idle",
       boundsChangeListener
     );
 
@@ -123,7 +126,7 @@ export default function HomePage() {
       if (!kakaoMapRef.current) return;
       kakao.maps.event.removeListener(
         kakaoMapRef.current,
-        "bounds_changed",
+        "idle",
         boundsChangeListener
       );
     };
@@ -132,13 +135,23 @@ export default function HomePage() {
   return (
     <main className={classNames.container}>
       <div ref={mapContainerRef} className={classNames.kakao_map} />
+      <Sheet
+        trigger={
+          <button
+            style={{ position: "absolute", zIndex: 10, top: 0, left: 0 }}
+            onClick={() => toggle()}
+          >
+            버튼
+          </button>
+        }
+        content={<div>{}</div>}
+        open={opened}
+        hasOverlay
+        onClickOverlay={() => close()}
+      />
     </main>
   );
 }
 
-// 카카오 맵 띄우기
-// 현재 위치 받아오기
-// /api/v1/spots로 주변 산스장 목록 가져오기
-// 지도에 산스장 위치 띄우기
 // 위치 클릭 시 상세 bottom sheet 띄우기
 // 위치 외에 클릭 시 bottom sheet 닫기
