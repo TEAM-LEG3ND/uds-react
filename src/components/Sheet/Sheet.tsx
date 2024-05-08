@@ -12,7 +12,7 @@ import classNames from "./Sheet.module.css";
 
 interface RootProps {
   open: boolean;
-  trigger: ReactNode;
+  trigger?: ReactNode;
   content: ReactNode;
   direction?: "b" | "r" | "l" | "t";
   hasOverlay?: boolean;

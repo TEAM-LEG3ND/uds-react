@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 
+import GymMarker from "@/components/GymMarker";
 import Sheet from "@/components/Sheet/Sheet";
 import { useSheet } from "@/components/Sheet/Sheet.hooks";
 import classNames from "@/pages/index.module.css";
@@ -12,10 +13,19 @@ export default function HomePage() {
     longitude: 0,
   });
   const [gymList, setGymList] = useState<Gym[]>([]);
+  const [selectedGym, setSelectedGym] = useState<Gym>({
+    id: 0,
+    name: "",
+    description: "",
+    address: "",
+    latitude: 0,
+    longitude: 0,
+    facilities: [],
+  });
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const kakaoMapRef = useRef<kakao.maps.Map | null>(null);
   const queryClient = useQueryClient();
-  const { opened, toggle, close } = useSheet();
+  const { opened, open, close } = useSheet();
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
@@ -72,27 +82,25 @@ export default function HomePage() {
   useEffect(() => {
     if (!kakaoMapRef.current) return;
 
-    const gymMarkerList = gymList
-      .map((gym: Gym) => ({
-        id: gym.id,
-        name: gym.name,
-        description: gym.description,
-        address: gym.address,
-        pos: new kakao.maps.LatLng(gym.latitude, gym.longitude),
-      }))
-      .map(
-        (gym) =>
-          new kakao.maps.Marker({
-            position: gym.pos,
-            title: gym.name,
-            clickable: true,
-          })
-      );
+    const gymMarkerList = gymList.map(
+      (gym) =>
+        new GymMarker(gym, {
+          position: new kakao.maps.LatLng(gym.latitude, gym.longitude),
+          title: gym.name,
+          clickable: true,
+        })
+    );
 
     for (const marker of gymMarkerList) {
       marker.setMap(kakaoMapRef.current);
     }
-  }, [gymList]);
+    for (const marker of gymMarkerList) {
+      kakao.maps.event.addListener(marker, "click", () => {
+        setSelectedGym(marker.getGym());
+        open();
+      });
+    }
+  }, [gymList, open]);
 
   useEffect(() => {
     if (!kakaoMapRef.current) return;
@@ -136,17 +144,12 @@ export default function HomePage() {
     <main className={classNames.container}>
       <div ref={mapContainerRef} className={classNames.kakao_map} />
       <Sheet
-        trigger={
-          <button
-            style={{ position: "absolute", zIndex: 10, top: 0, left: 0 }}
-            onClick={() => toggle()}
-          >
-            버튼
-          </button>
+        content={
+          <div>
+            <div>{JSON.stringify(selectedGym)}</div>
+          </div>
         }
-        content={<div>{}</div>}
         open={opened}
-        hasOverlay
         onClickOverlay={() => close()}
       />
     </main>
