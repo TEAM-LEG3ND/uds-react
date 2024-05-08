@@ -17,6 +17,7 @@ declare namespace kakao.maps.event {
   export function addListener(
     target: EventTarget,
     type: string,
+    // eslint-disable-next-line @typescript-eslint/ban-types
     handler: Function
   ): void;
 
@@ -30,6 +31,7 @@ declare namespace kakao.maps.event {
   export function removeListener(
     target: EventTarget,
     type: string,
+    // eslint-disable-next-line @typescript-eslint/ban-types
     handler: Function
   ): void;
 
@@ -40,6 +42,7 @@ declare namespace kakao.maps.event {
    * @param type 이벤트 이름
    * @param data 이벤트를 처리하는 함수에 넘길 변수
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   export function trigger(target: EventTarget, type: string, data?: any): void;
 
   /**

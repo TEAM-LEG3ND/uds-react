@@ -1,9 +1,9 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 
-import GymMarker from "@/components/GymMarker";
 import Sheet from "@/components/Sheet/Sheet";
 import { useSheet } from "@/components/Sheet/Sheet.hooks";
+import GymMarker from "@/models/GymMarker";
 import classNames from "@/pages/index.module.css";
 import { Gym } from "@/types/models";
 
