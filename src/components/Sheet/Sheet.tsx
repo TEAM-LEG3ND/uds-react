@@ -1,17 +1,12 @@
-import {
-  ReactNode,
-  useEffect,
-  useLayoutEffect,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
-import { createPortal, flushSync } from "react-dom";
+import { CSSProperties, ReactNode, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+
+import { useUnmount } from "@/hooks/use-unmount";
 
 import classNames from "./Sheet.module.css";
 
 interface RootProps {
-  open: boolean;
+  visibility: number;
   trigger?: ReactNode;
   content: ReactNode;
   direction?: "b" | "r" | "l" | "t";
@@ -19,83 +14,27 @@ interface RootProps {
   onClickOverlay?: () => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type UnionToIntersection<T> = (T extends any ? (x: T) => any : never) extends (
-  x: infer R
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-) => any
-  ? R
-  : never;
-
 export default function Sheet({
-  open,
+  visibility,
   trigger,
   content,
   hasOverlay = false,
   onClickOverlay = () => {},
 }: RootProps) {
-  const [sheet, setSheet] = useState<HTMLElement | null>(null);
-  const stateMachine = {
-    mounted: {
-      UNMOUNT: "unmounted",
-      ANIMATION_OUT: "unmountSuspended",
-    },
-    unmountSuspended: {
-      MOUNT: "mounted",
-      ANIMATION_END: "unmounted",
-    },
-    unmounted: {
-      MOUNT: "mounted",
-    },
-  };
-  const stylesRef = useRef<CSSStyleDeclaration | null>(null);
-  const prevOpenRef = useRef<boolean>(open);
-  const initialState = open ? "mounted" : "unmounted";
-
-  const [state, dispatch] = useReducer(
-    (
-      state: keyof typeof stateMachine,
-      action: keyof UnionToIntersection<
-        (typeof stateMachine)[keyof typeof stateMachine]
-      >
-    ) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const nextState = (stateMachine[state] as any)[action];
-
-      return nextState ?? state;
-    },
-    initialState
-  );
-
-  useLayoutEffect(() => {
-    const openChanged = prevOpenRef.current !== open;
-    if (!openChanged) return;
-    const noAnimation =
-      (stylesRef.current?.getPropertyValue("animation-name") || "none") ===
-      "none";
-    if (open) {
-      dispatch("MOUNT");
-    } else if (noAnimation) {
-      dispatch("UNMOUNT");
-    } else {
-      dispatch("ANIMATION_OUT");
-    }
-    prevOpenRef.current = open;
-  }, [open]);
+  const { isPresent, ref: sheetRef } = useUnmount<HTMLDivElement>(!!visibility);
+  const prevVisibilityRef = useRef<number>(visibility);
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [style, setStyle] = useState<CSSProperties>({
+    transform: "translateY(0%)",
+  });
 
   useEffect(() => {
-    if (!sheet) return;
-    const handleAnimationEnd = () => {
-      flushSync(() => {
-        dispatch("ANIMATION_END");
+    if (isPresent) {
+      setStyle({
+        transform: `translateY(${prevVisibilityRef.current - visibility}%)`,
       });
-    };
-
-    sheet.addEventListener("animationend", handleAnimationEnd);
-    sheet.addEventListener("animationcancel", handleAnimationEnd);
-  }, [sheet, dispatch]);
-
-  const isPresent = ["mounted", "unmountSuspended"].includes(state);
+    }
+  }, [isPresent, visibility]);
 
   return (
     <div className={classNames.root}>
@@ -113,14 +52,14 @@ export default function Sheet({
               ) : null}
               {isPresent ? (
                 <div
-                  ref={(node: HTMLDivElement) => {
-                    setSheet(node);
+                  ref={(node) => {
                     if (node) {
-                      stylesRef.current = getComputedStyle(node);
+                      sheetRef(node);
+                      ref.current = node;
                     }
                   }}
+                  style={style}
                   className={classNames.container}
-                  data-state={open ? "open" : "close"}
                 >
                   {content}
                 </div>

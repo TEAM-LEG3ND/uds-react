@@ -25,7 +25,7 @@ export default function HomePage() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const kakaoMapRef = useRef<kakao.maps.Map | null>(null);
   const queryClient = useQueryClient();
-  const { opened, open, close } = useSheet();
+  const { visibility, open, close } = useSheet();
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
@@ -97,7 +97,7 @@ export default function HomePage() {
     for (const marker of gymMarkerList) {
       kakao.maps.event.addListener(marker, "click", () => {
         setSelectedGym(marker.getGym());
-        open();
+        open(40);
       });
     }
   }, [gymList, open]);
@@ -146,11 +146,13 @@ export default function HomePage() {
       <Sheet
         content={
           <div>
+            <button onClick={() => open(80)}>full</button>
             <div>{JSON.stringify(selectedGym)}</div>
           </div>
         }
-        open={opened}
+        visibility={visibility}
         onClickOverlay={() => close()}
+        hasOverlay
       />
     </main>
   );

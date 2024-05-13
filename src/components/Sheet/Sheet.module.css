@@ -1,25 +1,19 @@
 .container {
   --animation-ease-out-fast: cubic-bezier(0, -0.01, 0.27, 0.99);
+  --slide-duration: 0.2s;
 
   position: absolute;
-  bottom: -60%;
+  bottom: -100%;
   left: 0;
   width: 100%;
-  height: 60%;
+  height: 100%;
   padding: 16px;
   background-color: #fff;
   border-radius: 24px 24px 0 0;
   z-index: 9999;
-}
-
-.container[data-state="open"] {
-  animation: 0.2s var(--animation-ease-out-fast) 0s 1 normal slidein;
-  bottom: 0;
-}
-
-.container[data-state="close"] {
-  animation: 0.2s var(--animation-ease-out-fast) 0s 1 normal slideout;
-  bottom: -60%;
+  overflow-x: hidden;
+  transform: translate(0%);
+  transition: transform var(--slide-duration) var(--animation-ease-out-fast);
 }
 
 .overlay {
@@ -27,22 +21,4 @@
   inset: 0;
   background-color: rgba(0, 0, 0, 0.1);
   z-index: 9999;
-}
-
-@keyframes slidein {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0%);
-  }
-}
-
-@keyframes slideout {
-  from {
-    transform: translateY(-100%);
-  }
-  to {
-    transform: translateY(0%);
-  }
 }

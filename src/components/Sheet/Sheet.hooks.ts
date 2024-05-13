@@ -1,24 +1,19 @@
 import { useCallback, useState } from "react";
 
-export const useSheet = (defaultOpen: boolean = false) => {
-  const [opened, setOpened] = useState(defaultOpen);
+export const useSheet = (defaultVisibility: number = 0) => {
+  const [visibility, setVisibility] = useState(defaultVisibility);
 
-  const open = useCallback(() => {
-    setOpened(true);
+  const open = useCallback((visibility: number) => {
+    setVisibility(visibility);
   }, []);
 
   const close = useCallback(() => {
-    setOpened(false);
-  }, []);
-
-  const toggle = useCallback(() => {
-    setOpened((o) => !o);
+    setVisibility(0);
   }, []);
 
   return {
-    opened,
+    visibility,
     open,
     close,
-    toggle,
   };
 };
