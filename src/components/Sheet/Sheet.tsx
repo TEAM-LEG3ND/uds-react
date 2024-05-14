@@ -75,6 +75,7 @@ const Sheet = forwardRef<HTMLDivElement, RootProps>(
                       }
                     }}
                     style={style}
+                    data-full={visibility === 100}
                     className={classNames.container}
                   >
                     {content}

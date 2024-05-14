@@ -172,6 +172,9 @@ export default function HomePage() {
       const endY = e.changedTouches[0].clientY;
       if (endY < startY.current) {
         open(100);
+      } else if (endY > startY.current) {
+        if (visibility === 100) open(40);
+        else if (visibility === 40) close();
       }
 
       startY.current = null;
@@ -184,7 +187,7 @@ export default function HomePage() {
       document.removeEventListener("touchstart", handleTouchStart);
       document.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [open]);
+  }, [open, visibility, close]);
 
   return (
     <main className={classNames.container}>
