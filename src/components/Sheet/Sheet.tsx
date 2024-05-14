@@ -19,6 +19,7 @@ interface RootProps {
   direction?: "b" | "r" | "l" | "t";
   hasOverlay?: boolean;
   onClickOverlay?: () => void;
+  onSwipeUp?: (e: TouchEvent) => void;
 }
 
 const Sheet = forwardRef<HTMLDivElement, RootProps>(

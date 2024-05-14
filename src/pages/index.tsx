@@ -27,6 +27,7 @@ export default function HomePage() {
   const queryClient = useQueryClient();
   const { visibility, open, close } = useSheet();
   const sheetRef = useRef<HTMLDivElement | null>(null);
+  const startY = useRef<number | null>(null);
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
@@ -155,6 +156,35 @@ export default function HomePage() {
 
     return () => document.removeEventListener("click", handleClickOutside);
   }, [close]);
+
+  useEffect(() => {
+    const handleTouchStart = (e: TouchEvent) => {
+      if (
+        sheetRef.current &&
+        sheetRef.current.contains(e.target as HTMLElement)
+      ) {
+        startY.current = e.touches[0].clientY;
+      }
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (!startY.current) return;
+      const endY = e.changedTouches[0].clientY;
+      if (endY < startY.current) {
+        open(100);
+      }
+
+      startY.current = null;
+    };
+
+    document.addEventListener("touchstart", handleTouchStart);
+    document.addEventListener("touchend", handleTouchEnd);
+
+    return () => {
+      document.removeEventListener("touchstart", handleTouchStart);
+      document.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [open]);
 
   return (
     <main className={classNames.container}>
