@@ -26,6 +26,7 @@ export default function HomePage() {
   const kakaoMapRef = useRef<kakao.maps.Map | null>(null);
   const queryClient = useQueryClient();
   const { visibility, open, close } = useSheet();
+  const sheetRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
@@ -140,19 +141,33 @@ export default function HomePage() {
     };
   }, [queryClient, kakaoMapRef.current]);
 
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        sheetRef.current &&
+        !sheetRef.current.contains(e.target as HTMLElement)
+      ) {
+        close();
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [close]);
+
   return (
     <main className={classNames.container}>
       <div ref={mapContainerRef} className={classNames.kakao_map} />
       <Sheet
+        ref={sheetRef}
         content={
           <div>
-            <button onClick={() => open(80)}>full</button>
             <div>{JSON.stringify(selectedGym)}</div>
           </div>
         }
         visibility={visibility}
         onClickOverlay={() => close()}
-        hasOverlay
       />
     </main>
   );
