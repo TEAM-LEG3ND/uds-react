@@ -88,5 +88,6 @@ const Sheet = forwardRef<HTMLDivElement, RootProps>(
     );
   }
 );
+Sheet.displayName = "Sheet";
 
 export default Sheet;
