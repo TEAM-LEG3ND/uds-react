@@ -8,7 +8,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
-import { useUnmount } from "@/hooks/use-unmount";
+import usePresence from "@/hooks/use-presence";
 
 import classNames from "./Sheet.module.css";
 
@@ -19,7 +19,6 @@ interface RootProps {
   direction?: "b" | "r" | "l" | "t";
   hasOverlay?: boolean;
   onClickOverlay?: () => void;
-  onSwipeUp?: (e: TouchEvent) => void;
 }
 
 const Sheet = forwardRef<HTMLDivElement, RootProps>(
@@ -34,7 +33,7 @@ const Sheet = forwardRef<HTMLDivElement, RootProps>(
     ref
   ) => {
     const { isPresent, ref: sheetRef } =
-      useUnmount<HTMLDivElement>(!!visibility);
+      usePresence<HTMLDivElement>(!!visibility);
     const prevVisibilityRef = useRef<number>(visibility);
     const [style, setStyle] = useState<CSSProperties>({
       transform: "translateY(0%)",

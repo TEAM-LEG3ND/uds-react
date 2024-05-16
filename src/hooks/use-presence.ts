@@ -3,9 +3,7 @@ import { flushSync } from "react-dom";
 
 import { useStateMachine } from "@/hooks/use-state-machine";
 
-export const useUnmount = <EL extends HTMLElement>(
-  present: boolean = false
-) => {
+const usePresence = <EL extends HTMLElement>(present: boolean = false) => {
   const [node, setNode] = useState<EL | null>(null);
   const stylesRef = useRef<CSSStyleDeclaration | null>(null);
   const prevPresentRef = useRef<boolean>(present);
@@ -78,3 +76,5 @@ export const useUnmount = <EL extends HTMLElement>(
     isPresent,
   };
 };
+
+export default usePresence;
