@@ -3,9 +3,11 @@ import { useEffect, useRef, useState } from "react";
 
 import Sheet from "@/components/Sheet/Sheet";
 import { useSheet } from "@/components/Sheet/Sheet.hooks";
+import { useClickOutside } from "@/hooks/use-click-outside";
 import GymMarker from "@/models/GymMarker";
 import classNames from "@/pages/index.module.css";
 import { Gym } from "@/types/models";
+import { compoundRefs } from "@/utils";
 
 export default function HomePage() {
   const [currentPos, setCurrentPos] = useState({
@@ -28,6 +30,7 @@ export default function HomePage() {
   const { visibility, open, close } = useSheet();
   const sheetRef = useRef<HTMLDivElement | null>(null);
   const startY = useRef<number | null>(null);
+  const { target: targetRef } = useClickOutside<HTMLDivElement>(() => close());
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
@@ -133,21 +136,6 @@ export default function HomePage() {
   }, [queryClient, map]);
 
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        sheetRef.current &&
-        !sheetRef.current.contains(e.target as HTMLElement)
-      ) {
-        close();
-      }
-    };
-
-    document.addEventListener("click", handleClickOutside);
-
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, [close]);
-
-  useEffect(() => {
     const handleTouchStart = (e: TouchEvent) => {
       if (
         sheetRef.current &&
@@ -183,7 +171,7 @@ export default function HomePage() {
     <main className={classNames.container}>
       <div ref={mapContainerRef} className={classNames.kakao_map} />
       <Sheet
-        ref={sheetRef}
+        ref={compoundRefs([sheetRef, targetRef])}
         content={
           <div>
             <div>{JSON.stringify(selectedGym)}</div>
