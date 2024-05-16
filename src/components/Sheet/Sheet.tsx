@@ -9,6 +9,7 @@ import {
 import { createPortal } from "react-dom";
 
 import usePresence from "@/hooks/use-presence";
+import { compoundRefs } from "@/utils";
 
 import classNames from "./Sheet.module.css";
 
@@ -63,16 +64,7 @@ const Sheet = forwardRef<HTMLDivElement, RootProps>(
                 ) : null}
                 {isPresent ? (
                   <div
-                    ref={(node) => {
-                      if (node) {
-                        sheetRef(node);
-                        if (typeof ref === "function") {
-                          ref(node);
-                        } else if (ref) {
-                          ref.current = node;
-                        }
-                      }
-                    }}
+                    ref={compoundRefs([sheetRef, ref])}
                     style={style}
                     data-full={visibility === 100}
                     className={classNames.container}
