@@ -23,7 +23,7 @@ export default function HomePage() {
     facilities: [],
   });
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const kakaoMapRef = useRef<kakao.maps.Map | null>(null);
+  const [map, setMap] = useState<kakao.maps.Map | null>(null);
   const queryClient = useQueryClient();
   const { visibility, open, close } = useSheet();
   const sheetRef = useRef<HTMLDivElement | null>(null);
@@ -49,17 +49,14 @@ export default function HomePage() {
       level: 2,
       draggable: true,
     };
-    kakaoMapRef.current = new kakao.maps.Map(
-      mapContainerRef.current,
-      mapOption
-    );
+    setMap(new kakao.maps.Map(mapContainerRef.current, mapOption));
   }, [currentPos]);
 
   useEffect(() => {
-    if (!kakaoMapRef.current) return;
+    if (!map) return;
     if (currentPos.latitude === 0 && currentPos.longitude === 0) return;
 
-    const mapBoundary = kakaoMapRef.current.getBounds();
+    const mapBoundary = map.getBounds();
     const swLanLng = mapBoundary.getSouthWest();
     const neLanLng = mapBoundary.getNorthEast();
 
@@ -79,10 +76,10 @@ export default function HomePage() {
       setGymList(gymList);
     };
     fetchData();
-  }, [currentPos.latitude, currentPos.longitude, queryClient]);
+  }, [currentPos.latitude, currentPos.longitude, queryClient, map]);
 
   useEffect(() => {
-    if (!kakaoMapRef.current) return;
+    if (!map) return;
 
     const gymMarkerList = gymList.map(
       (gym) =>
@@ -94,7 +91,7 @@ export default function HomePage() {
     );
 
     for (const marker of gymMarkerList) {
-      marker.setMap(kakaoMapRef.current);
+      marker.setMap(map);
     }
     for (const marker of gymMarkerList) {
       kakao.maps.event.addListener(marker, "click", () => {
@@ -102,15 +99,16 @@ export default function HomePage() {
         open(40);
       });
     }
-  }, [gymList, open]);
+  }, [gymList, open, map]);
 
   useEffect(() => {
-    if (!kakaoMapRef.current) return;
+    if (!map) return;
+
     const boundsChangeListener = async () => {
       queryClient.cancelQueries({
         queryKey: ["spots", "current"],
       });
-      const mapBoundary = kakaoMapRef.current!.getBounds();
+      const mapBoundary = map.getBounds();
       const swLanLng = mapBoundary.getSouthWest();
       const neLanLng = mapBoundary.getNorthEast();
       const data = await queryClient.fetchQuery({
@@ -126,21 +124,13 @@ export default function HomePage() {
       });
       setGymList(data);
     };
-    kakao.maps.event.addListener(
-      kakaoMapRef.current,
-      "idle",
-      boundsChangeListener
-    );
+    kakao.maps.event.addListener(map, "idle", boundsChangeListener);
 
     return () => {
-      if (!kakaoMapRef.current) return;
-      kakao.maps.event.removeListener(
-        kakaoMapRef.current,
-        "idle",
-        boundsChangeListener
-      );
+      if (!map) return;
+      kakao.maps.event.removeListener(map, "idle", boundsChangeListener);
     };
-  }, [queryClient, kakaoMapRef.current]);
+  }, [queryClient, map]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
