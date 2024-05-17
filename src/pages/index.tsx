@@ -1,10 +1,12 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 
+import GymMarker from "@/components/GymMarker";
+import Map from "@/components/Map";
 import Sheet from "@/components/Sheet/Sheet";
 import { useSheet } from "@/components/Sheet/Sheet.hooks";
 import { useClickOutside } from "@/hooks/use-click-outside";
-import GymMarker from "@/models/GymMarker";
+import useSwipe from "@/hooks/use-swipe";
 import classNames from "@/pages/index.module.css";
 import { Gym } from "@/types/models";
 import { compoundRefs } from "@/utils";
@@ -24,13 +26,19 @@ export default function HomePage() {
     longitude: 0,
     facilities: [],
   });
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const [map, setMap] = useState<kakao.maps.Map | null>(null);
   const queryClient = useQueryClient();
   const { visibility, open, close } = useSheet();
   const sheetRef = useRef<HTMLDivElement | null>(null);
-  const startY = useRef<number | null>(null);
-  const { target: targetRef } = useClickOutside<HTMLDivElement>(() => close());
+  const { targetRef } = useClickOutside<HTMLDivElement>(() => close());
+  const { elementRef } = useSwipe<HTMLDivElement>({
+    onSwipeUp: () => {
+      open(100);
+    },
+    onSwipeDown: () => {
+      if (visibility === 100) open(40);
+      else if (visibility === 40) close();
+    },
+  });
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
@@ -44,24 +52,34 @@ export default function HomePage() {
     );
   }, []);
 
-  useEffect(() => {
-    if (!mapContainerRef.current) return;
+  const onChangeBounds = async (boundary: kakao.maps.LatLngBounds) => {
+    queryClient.cancelQueries({
+      queryKey: ["spots", "current"],
+    });
+    const swLanLng = boundary.getSouthWest();
+    const neLanLng = boundary.getNorthEast();
+    const fetchData = async () => {
+      const data = await queryClient.fetchQuery({
+        queryKey: [],
+        queryFn: async () => {
+          const res = await fetch(
+            `${import.meta.env.VITE_API_ENDPOINT}/spots/boundary?swlat=${swLanLng.getLat()}&swlng=${swLanLng.getLng()}&nelat=${neLanLng.getLat()}&nelng=${neLanLng.getLng()}`
+          );
+          const data = await res.json();
 
-    const mapOption = {
-      center: new kakao.maps.LatLng(currentPos.latitude, currentPos.longitude),
-      level: 2,
-      draggable: true,
+          return data;
+        },
+      });
+      setGymList(data);
     };
-    setMap(new kakao.maps.Map(mapContainerRef.current, mapOption));
-  }, [currentPos]);
 
-  useEffect(() => {
-    if (!map) return;
-    if (currentPos.latitude === 0 && currentPos.longitude === 0) return;
+    fetchData();
+  };
 
-    const mapBoundary = map.getBounds();
-    const swLanLng = mapBoundary.getSouthWest();
-    const neLanLng = mapBoundary.getNorthEast();
+  const onInitMap = (map: kakao.maps.Map) => {
+    const boundary = map.getBounds();
+    const swLanLng = boundary.getSouthWest();
+    const neLanLng = boundary.getNorthEast();
 
     const fetchData = async () => {
       const gymList = await queryClient.fetchQuery({
@@ -79,99 +97,29 @@ export default function HomePage() {
       setGymList(gymList);
     };
     fetchData();
-  }, [currentPos.latitude, currentPos.longitude, queryClient, map]);
-
-  useEffect(() => {
-    if (!map) return;
-
-    const gymMarkerList = gymList.map(
-      (gym) =>
-        new GymMarker(gym, {
-          position: new kakao.maps.LatLng(gym.latitude, gym.longitude),
-          title: gym.name,
-          clickable: true,
-        })
-    );
-
-    for (const marker of gymMarkerList) {
-      marker.setMap(map);
-    }
-    for (const marker of gymMarkerList) {
-      kakao.maps.event.addListener(marker, "click", () => {
-        setSelectedGym(marker.getGym());
-        open(40);
-      });
-    }
-  }, [gymList, open, map]);
-
-  useEffect(() => {
-    if (!map) return;
-
-    const boundsChangeListener = async () => {
-      queryClient.cancelQueries({
-        queryKey: ["spots", "current"],
-      });
-      const mapBoundary = map.getBounds();
-      const swLanLng = mapBoundary.getSouthWest();
-      const neLanLng = mapBoundary.getNorthEast();
-      const data = await queryClient.fetchQuery({
-        queryKey: [],
-        queryFn: async () => {
-          const res = await fetch(
-            `${import.meta.env.VITE_API_ENDPOINT}/spots/boundary?swlat=${swLanLng.getLat()}&swlng=${swLanLng.getLng()}&nelat=${neLanLng.getLat()}&nelng=${neLanLng.getLng()}`
-          );
-          const data = await res.json();
-
-          return data;
-        },
-      });
-      setGymList(data);
-    };
-    kakao.maps.event.addListener(map, "idle", boundsChangeListener);
-
-    return () => {
-      if (!map) return;
-      kakao.maps.event.removeListener(map, "idle", boundsChangeListener);
-    };
-  }, [queryClient, map]);
-
-  useEffect(() => {
-    const handleTouchStart = (e: TouchEvent) => {
-      if (
-        sheetRef.current &&
-        sheetRef.current.contains(e.target as HTMLElement)
-      ) {
-        startY.current = e.touches[0].clientY;
-      }
-    };
-
-    const handleTouchEnd = (e: TouchEvent) => {
-      if (!startY.current) return;
-      const endY = e.changedTouches[0].clientY;
-      if (endY < startY.current) {
-        open(100);
-      } else if (endY > startY.current) {
-        if (visibility === 100) open(40);
-        else if (visibility === 40) close();
-      }
-
-      startY.current = null;
-    };
-
-    document.addEventListener("touchstart", handleTouchStart);
-    document.addEventListener("touchend", handleTouchEnd);
-
-    return () => {
-      document.removeEventListener("touchstart", handleTouchStart);
-      document.removeEventListener("touchend", handleTouchEnd);
-    };
-  }, [open, visibility, close]);
+  };
 
   return (
     <main className={classNames.container}>
-      <div ref={mapContainerRef} className={classNames.kakao_map} />
+      <Map
+        center={currentPos}
+        onInit={onInitMap}
+        onChangeBounds={onChangeBounds}
+        className={classNames.kakao_map}
+      >
+        {gymList.map((gym) => (
+          <GymMarker
+            key={gym.id}
+            gym={gym}
+            onClick={(gym) => {
+              setSelectedGym(gym);
+              open(40);
+            }}
+          />
+        ))}
+      </Map>
       <Sheet
-        ref={compoundRefs([sheetRef, targetRef])}
+        ref={compoundRefs([sheetRef, targetRef, elementRef])}
         content={
           <div>
             <div>{JSON.stringify(selectedGym)}</div>

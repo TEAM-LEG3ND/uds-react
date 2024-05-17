@@ -25,5 +25,5 @@ export const useClickOutside = <EL extends HTMLElement>(
     };
   }, [event]);
 
-  return { target: targetRef };
+  return { targetRef };
 };
