@@ -1,0 +1,61 @@
+.container {
+  height: 30%;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+.subtitle {
+  font-weight: 400;
+  font-size: 0.875rem;
+  color: #4d4d4d;
+}
+
+.address_container {
+  margin-top: 4px;
+  display: flex;
+  gap: 16px;
+  font-size: 0.875rem;
+}
+
+.distance {
+  font-weight: 600;
+}
+
+.footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: end;
+}
+
+.action_btn {
+  padding-block: 6px;
+  padding-inline: 16px;
+  background-color: #4d4d4d;
+  color: #fff;
+  font-size: 0.875rem;
+  border-radius: 50% / 100%;
+}
+
+.facility_list_container {
+  margin-top: 16px;
+}
+
+.facility_list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.facility_card {
+  height: 48px;
+  aspect-ratio: 1/1;
+  border-radius: 6px;
+  box-shadow: 0px 0px 4px 1px rgba(75, 75, 75, 0.05);
+  background-color: #4d4d4d;
+}

@@ -1,7 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 
 import GymMarker from "@/components/GymMarker";
+import GymPreview from "@/components/GymPreview";
 import Map from "@/components/Map";
 import Sheet from "@/components/Sheet/Sheet";
 import { useSheet } from "@/components/Sheet/Sheet.hooks";
@@ -35,8 +36,8 @@ export default function HomePage() {
       open(100);
     },
     onSwipeDown: () => {
-      if (visibility === 100) open(40);
-      else if (visibility === 40) close();
+      if (visibility === 100) open(30);
+      else if (visibility === 30) close();
     },
   });
 
@@ -113,7 +114,7 @@ export default function HomePage() {
             gym={gym}
             onClick={(gym) => {
               setSelectedGym(gym);
-              open(40);
+              open(30);
             }}
           />
         ))}
@@ -121,13 +122,16 @@ export default function HomePage() {
       <Sheet
         ref={compoundRefs([sheetRef, targetRef, elementRef])}
         content={
-          <div>
-            <div>{JSON.stringify(selectedGym)}</div>
-          </div>
+          <Suspense fallback={<Loader />}>
+            <GymPreview gym={selectedGym} currentCoord={currentPos} />
+          </Suspense>
         }
         visibility={visibility}
-        onClickOverlay={() => close()}
       />
     </main>
   );
+}
+
+function Loader() {
+  return <div className={classNames.loader} />;
 }
