@@ -1,4 +1,4 @@
-import "@/styles/normalize.css";
+import "@/styles/preflight.css";
 import "@/styles/globals.css";
 
 import { StrictMode } from "react";
