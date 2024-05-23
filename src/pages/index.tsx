@@ -9,7 +9,7 @@ import { useSheet } from "@/components/Sheet/Sheet.hooks";
 import { useClickOutside } from "@/hooks/use-click-outside";
 import useSwipe from "@/hooks/use-swipe";
 import classNames from "@/pages/index.module.css";
-import { Gym } from "@/types/models";
+import { TGym } from "@/types/models";
 import { compoundRefs } from "@/utils";
 
 export default function HomePage() {
@@ -17,8 +17,8 @@ export default function HomePage() {
     latitude: 0,
     longitude: 0,
   });
-  const [gymList, setGymList] = useState<Gym[]>([]);
-  const [selectedGym, setSelectedGym] = useState<Gym>({
+  const [gymList, setGymList] = useState<TGym[]>([]);
+  const [selectedGym, setSelectedGym] = useState<TGym>({
     id: 0,
     name: "",
     description: "",

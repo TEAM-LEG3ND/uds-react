@@ -1,14 +1,24 @@
-export type Facility = {
-  id: number;
-  name: string;
-};
+import { z } from "zod";
 
-export type Gym = {
-  id: number;
-  name: string;
-  description: string;
-  address: string;
-  latitude: number;
-  longitude: number;
-  facilities: Facility[];
-};
+export const Facility = z.object({
+  id: z.number(),
+  name: z.string(),
+});
+export type TFacility = z.infer<typeof Facility>;
+
+export const Gym = z.object({
+  id: z.number(),
+  name: z.string(),
+  description: z.string(),
+  address: z.string(),
+  latitude: z.number(),
+  longitude: z.number(),
+  facilities: Facility.array(),
+});
+export type TGym = z.infer<typeof Gym>;
+
+export const Position = z.object({
+  latitude: z.number(),
+  longitude: z.number(),
+});
+export type TPosition = z.infer<typeof Position>;
