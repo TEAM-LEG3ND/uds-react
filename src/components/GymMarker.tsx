@@ -1,11 +1,11 @@
 import { useEffect, useRef } from "react";
 
 import { useMap } from "@/components/MapProvider";
-import { Gym } from "@/types/models";
+import { TGym } from "@/types/models";
 
 interface Props {
-  gym: Gym;
-  onClick?: (gym: Gym) => void;
+  gym: TGym;
+  onClick?: (gym: TGym) => void;
 }
 
 function GymMarker({ gym, onClick }: Props) {

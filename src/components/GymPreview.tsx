@@ -1,11 +1,11 @@
 import { useSuspenseQueries } from "@tanstack/react-query";
 
 import classNames from "@/components/GymPreview.module.css";
-import { Facility, Gym } from "@/types/models";
+import { TFacility, TGym } from "@/types/models";
 import { calculateDirectWTMDistance, takeTopN } from "@/utils";
 
 interface Props {
-  gym: Gym;
+  gym: TGym;
   currentCoord: {
     latitude: number;
     longitude: number;
@@ -37,7 +37,7 @@ function GymPreview({ gym, currentCoord }: Props) {
       </section>
       <section className={classNames.facility_list_container}>
         <ul className={classNames.facility_list}>
-          {takeTopN<Facility>(gym.facilities, 5).map((facility) => (
+          {takeTopN<TFacility>(gym.facilities, 5).map((facility) => (
             <li key={facility.id}>
               <div className={classNames.facility_card}></div>
             </li>
@@ -45,7 +45,13 @@ function GymPreview({ gym, currentCoord }: Props) {
         </ul>
       </section>
       <footer className={classNames.footer}>
-        <button className={classNames.action_btn}>길찾기</button>
+        <a
+          href={`https://map.kakao.com/link/to/${gym.name},${gym.latitude},${gym.longitude}`}
+          target="_blank"
+          className={classNames.action_btn}
+        >
+          길찾기
+        </a>
       </footer>
     </div>
   );
