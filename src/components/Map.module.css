@@ -1,0 +1,11 @@
+.current_position_loader {
+  width: max-content;
+  padding-block: 8px;
+  padding-inline: 12px;
+  font-size: 0.875rem;
+  color: #000000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}

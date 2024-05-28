@@ -3,10 +3,10 @@
   --slide-duration: 0.2s;
 
   position: fixed;
-  bottom: 32px;
+  bottom: 48px;
   left: 50%;
-  width: 128px;
-  height: 32px;
+  width: max-content;
+  height: max-content;
   background-color: #fff;
   border-radius: 10px;
   z-index: 9999;

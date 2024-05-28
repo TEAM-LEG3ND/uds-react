@@ -1,11 +1,12 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 
+import { Spinner } from "@/components/Loader";
+import classNames from "@/components/Map.module.css";
 import { MapProvider } from "@/components/MapProvider";
 import Toast from "@/components/toast/Toast";
 import { CENTER_OF_SEOUL } from "@/constants";
 import { getCurrentPositionPromise } from "@/hooks/use-geolocation";
 import { getCachedCurrentPosition, setCurrentPositionCache } from "@/utils";
-
 interface MapProps {
   onInit: (map: kakao.maps.Map) => void;
   onChangeBounds: (boundary: kakao.maps.LatLngBounds) => void;
@@ -86,7 +87,14 @@ function Map({ onInit, onChangeBounds, children, className }: MapProps) {
     <div ref={containerRef} className={className}>
       <MapProvider map={kakaoMap}>
         {children}
-        <Toast visible={isLoading} content={<>로딩 중</>} />
+        <Toast
+          visible={isLoading}
+          content={
+            <div className={classNames.current_position_loader}>
+              <Spinner /> 현재 위치를 받아오는 중입니다...
+            </div>
+          }
+        />
       </MapProvider>
     </div>
   );
