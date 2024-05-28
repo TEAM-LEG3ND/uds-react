@@ -28,14 +28,17 @@ const usePresence = <EL extends HTMLElement>(present: boolean = false) => {
   useLayoutEffect(() => {
     const presentChanged = prevPresentRef.current !== present;
     if (!presentChanged) return;
-    const noAnimation =
-      (stylesRef.current?.getPropertyValue("animation-name") || "none") ===
+    const hasAnimation =
+      (stylesRef.current?.getPropertyValue("animation-name") || "none") !==
+        "none" ||
+      ((stylesRef.current?.getPropertyValue("transform") || "none") !==
         "none" &&
-      (stylesRef.current?.getPropertyValue("transform") || "none") === "none" &&
-      (stylesRef.current?.getPropertyValue("transition") || "none") === "none";
+        (stylesRef.current?.getPropertyValue("transitionDuration") ||
+          "none") !== "none");
+
     if (present) {
       send("MOUNT");
-    } else if (noAnimation) {
+    } else if (!hasAnimation) {
       send("UNMOUNT");
     } else {
       send("ANIMATION_OUT");

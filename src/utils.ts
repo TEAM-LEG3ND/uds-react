@@ -1,5 +1,7 @@
 import { MutableRefObject, Ref } from "react";
 
+import { type TPosition } from "@/types/models";
+
 export const compoundRefs =
   <T>(refs: Ref<T>[]) =>
   (node: T) => {
@@ -33,3 +35,41 @@ export const calculateDirectWTMDistance = (
 
 export const sleep = (time: number) =>
   new Promise((resolve) => setTimeout(resolve, time));
+
+const cacheKey = {
+  prevPosition: {
+    lat: "prevLat",
+    lgt: "prevLgt",
+  },
+};
+
+export const getCachedCurrentPosition = (): TPosition | null => {
+  try {
+    const lat = localStorage.getItem(cacheKey.prevPosition.lat);
+    const lgt = localStorage.getItem(cacheKey.prevPosition.lgt);
+    if (!lat || !lgt) return null;
+
+    return {
+      latitude: Number(lat),
+      longitude: Number(lgt),
+    };
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+};
+
+export const setCurrentPositionCache = (position: TPosition) => {
+  try {
+    localStorage.setItem(
+      cacheKey.prevPosition.lat,
+      position.latitude.toString()
+    );
+    localStorage.setItem(
+      cacheKey.prevPosition.lgt,
+      position.longitude.toString()
+    );
+  } catch (err) {
+    console.error(err);
+  }
+};

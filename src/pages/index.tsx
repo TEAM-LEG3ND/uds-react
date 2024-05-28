@@ -1,22 +1,23 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useRef, useState } from "react";
 
 import GymMarker from "@/components/GymMarker";
 import GymPreview from "@/components/GymPreview";
 import Map from "@/components/Map";
 import Sheet from "@/components/Sheet/Sheet";
 import { useSheet } from "@/components/Sheet/Sheet.hooks";
+import { CENTER_OF_SEOUL } from "@/constants";
 import { useClickOutside } from "@/hooks/use-click-outside";
+import { useCurrentPositionQuery } from "@/hooks/use-geolocation";
 import useSwipe from "@/hooks/use-swipe";
 import classNames from "@/pages/index.module.css";
 import { TGym } from "@/types/models";
-import { compoundRefs } from "@/utils";
+import { compoundRefs, getCachedCurrentPosition } from "@/utils";
 
 export default function HomePage() {
-  const [currentPos, setCurrentPos] = useState({
-    latitude: 0,
-    longitude: 0,
-  });
+  const { data: currentPosition } = useCurrentPositionQuery(
+    getCachedCurrentPosition() ?? CENTER_OF_SEOUL
+  );
   const [gymList, setGymList] = useState<TGym[]>([]);
   const [selectedGym, setSelectedGym] = useState<TGym>({
     id: 0,
@@ -40,18 +41,6 @@ export default function HomePage() {
       else if (visibility === 30) close();
     },
   });
-
-  useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setCurrentPos({
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude,
-        });
-      },
-      (err) => console.error(err)
-    );
-  }, []);
 
   const onChangeBounds = async (boundary: kakao.maps.LatLngBounds) => {
     queryClient.cancelQueries({
@@ -103,7 +92,6 @@ export default function HomePage() {
   return (
     <main className={classNames.container}>
       <Map
-        center={currentPos}
         onInit={onInitMap}
         onChangeBounds={onChangeBounds}
         className={classNames.kakao_map}
@@ -123,7 +111,7 @@ export default function HomePage() {
         ref={compoundRefs([sheetRef, targetRef, elementRef])}
         content={
           <Suspense fallback={<Loader />}>
-            <GymPreview gym={selectedGym} currentCoord={currentPos} />
+            <GymPreview gym={selectedGym} currentCoord={currentPosition} />
           </Suspense>
         }
         visibility={visibility}
