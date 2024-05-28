@@ -28,17 +28,12 @@ const usePresence = <EL extends HTMLElement>(present: boolean = false) => {
   useLayoutEffect(() => {
     const presentChanged = prevPresentRef.current !== present;
     if (!presentChanged) return;
-    const hasAnimation =
-      (stylesRef.current?.getPropertyValue("animation-name") || "none") !==
-        "none" ||
-      ((stylesRef.current?.getPropertyValue("transform") || "none") !==
-        "none" &&
-        (stylesRef.current?.getPropertyValue("transitionDuration") ||
-          "none") !== "none");
+
+    const noAnimation = !(stylesRef.current && hasAnimation(stylesRef.current));
 
     if (present) {
       send("MOUNT");
-    } else if (!hasAnimation) {
+    } else if (noAnimation) {
       send("UNMOUNT");
     } else {
       send("ANIMATION_OUT");
@@ -78,6 +73,24 @@ const usePresence = <EL extends HTMLElement>(present: boolean = false) => {
     },
     isPresent,
   };
+};
+
+const hasAnimation = (style: CSSStyleDeclaration) => {
+  const hasAnimation =
+    style.animationName !== "none" && style.animationName !== "";
+  const hasTransition =
+    style.transitionProperty !== "none" &&
+    style.transitionProperty !== "" &&
+    style.transitionDuration !== "0s";
+  const hasTransform =
+    style.transform !== "none" &&
+    style.transform !== "matrix(1, 0, 0, 1, 0, 0)";
+  const hasOpacity = style.opacity !== "1";
+  const hasFilter = style.filter !== "none" && style.filter !== "";
+
+  return (
+    hasAnimation || (hasTransition && hasTransform) || hasOpacity || hasFilter
+  );
 };
 
 export default usePresence;
