@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Suspense, useRef, useState } from "react";
 
 import CurrentPositionOverlay from "@/components/CurrentPositionOverlay";
+import GymDetail from "@/components/GymDetail";
 import GymMarker from "@/components/GymMarker";
 import GymPreview from "@/components/GymPreview";
 import Map from "@/components/Map";
@@ -15,11 +16,14 @@ import classNames from "@/pages/index.module.css";
 import { TGym } from "@/types/models";
 import { compoundRefs, getCachedCurrentPosition } from "@/utils";
 
+type TSheetLayout = "PREVIEW" | "DETAIL";
+
 export default function HomePage() {
   const { data: currentPosition } = useCurrentPositionQuery(
     getCachedCurrentPosition() ?? CENTER_OF_SEOUL
   );
   const [gymList, setGymList] = useState<TGym[]>([]);
+  const [sheetLayout, setSheetLayout] = useState<TSheetLayout>("PREVIEW");
   const [selectedGym, setSelectedGym] = useState<TGym>({
     id: 0,
     name: "",
@@ -36,10 +40,13 @@ export default function HomePage() {
   const { elementRef } = useSwipe<HTMLDivElement>({
     onSwipeUp: () => {
       open(100);
+      setSheetLayout("DETAIL");
     },
     onSwipeDown: () => {
-      if (visibility === 100) open(30);
-      else if (visibility === 30) close();
+      if (visibility === 100) {
+        open(30);
+        setSheetLayout("PREVIEW");
+      } else if (visibility === 30) close();
     },
   });
 
@@ -104,6 +111,7 @@ export default function HomePage() {
             onClick={(gym) => {
               setSelectedGym(gym);
               open(30);
+              setSheetLayout("PREVIEW");
             }}
           />
         ))}
@@ -115,7 +123,11 @@ export default function HomePage() {
         ref={compoundRefs([sheetRef, targetRef, elementRef])}
         content={
           <Suspense fallback={<Loader />}>
-            <GymPreview gym={selectedGym} currentCoord={currentPosition} />
+            {sheetLayout === "PREVIEW" ? (
+              <GymPreview gym={selectedGym} currentCoord={currentPosition} />
+            ) : (
+              <GymDetail gym={selectedGym} currentCoord={currentPosition} />
+            )}
           </Suspense>
         }
         visibility={visibility}

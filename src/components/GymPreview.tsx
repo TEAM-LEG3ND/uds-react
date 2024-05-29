@@ -2,7 +2,11 @@ import { useSuspenseQueries } from "@tanstack/react-query";
 
 import classNames from "@/components/GymPreview.module.css";
 import { TGym } from "@/types/models";
-import { calculateDirectWTMDistance, takeTopN } from "@/utils";
+import {
+  calculateDirectWTMDistance,
+  takeTopN,
+  translateWGS84ToWTMAsync,
+} from "@/utils";
 
 interface Props {
   gym: TGym;
@@ -66,25 +70,5 @@ function GymPreview({ gym, currentCoord }: Props) {
     </div>
   );
 }
-
-const translateWGS84ToWTMAsync = (x: number, y: number) => {
-  const geocoder = new kakao.maps.services.Geocoder();
-
-  return new Promise<{ x: number; y: number }>((resolve, reject) => {
-    geocoder.transCoord(
-      x,
-      y,
-      ([res], status) => {
-        if (status === kakao.maps.services.Status.ERROR)
-          reject("translation failed");
-        else resolve(res);
-      },
-      {
-        input_coord: kakao.maps.services.Coords.WGS84,
-        output_coord: kakao.maps.services.Coords.WTM,
-      }
-    );
-  });
-};
 
 export default GymPreview;

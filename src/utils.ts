@@ -33,6 +33,26 @@ export const calculateDirectWTMDistance = (
   return Math.round(Math.sqrt((end.x - start.x) ** 2 + (end.y - start.y) ** 2));
 };
 
+export const translateWGS84ToWTMAsync = (x: number, y: number) => {
+  const geocoder = new kakao.maps.services.Geocoder();
+
+  return new Promise<{ x: number; y: number }>((resolve, reject) => {
+    geocoder.transCoord(
+      x,
+      y,
+      ([res], status) => {
+        if (status === kakao.maps.services.Status.ERROR)
+          reject("translation failed");
+        else resolve(res);
+      },
+      {
+        input_coord: kakao.maps.services.Coords.WGS84,
+        output_coord: kakao.maps.services.Coords.WTM,
+      }
+    );
+  });
+};
+
 export const sleep = (time: number) =>
   new Promise((resolve) => setTimeout(resolve, time));
 
