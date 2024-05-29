@@ -1,7 +1,7 @@
 import { useSuspenseQueries } from "@tanstack/react-query";
 
 import classNames from "@/components/GymPreview.module.css";
-import { TFacility, TGym } from "@/types/models";
+import { TGym } from "@/types/models";
 import { calculateDirectWTMDistance, takeTopN } from "@/utils";
 
 interface Props {
@@ -24,6 +24,7 @@ function GymPreview({ gym, currentCoord }: Props) {
   });
 
   const distanceFromCur = calculateDirectWTMDistance(wtmCur, wtmDest);
+  const FACILITY_VISIBLE_COUNT = 6;
 
   return (
     <div className={classNames.container}>
@@ -37,11 +38,20 @@ function GymPreview({ gym, currentCoord }: Props) {
       </section>
       <section className={classNames.facility_list_container}>
         <ul className={classNames.facility_list}>
-          {takeTopN<TFacility>(gym.facilities, 5).map((facility) => (
+          {takeTopN(gym.facilities, FACILITY_VISIBLE_COUNT).map((facility) => (
             <li key={facility.id}>
-              <div className={classNames.facility_card}></div>
+              <button type="button" className={classNames.facility_tag}>
+                {facility.name}
+              </button>
             </li>
           ))}
+          {gym.facilities.length > FACILITY_VISIBLE_COUNT ? (
+            <li key={crypto.randomUUID()}>
+              <button type="button" className={classNames.facility_tag}>
+                외 {gym.facilities.length - FACILITY_VISIBLE_COUNT}개
+              </button>
+            </li>
+          ) : null}
         </ul>
       </section>
       <footer className={classNames.footer}>
