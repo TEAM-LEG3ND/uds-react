@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Suspense, useRef, useState } from "react";
 
+import CurrentPositionOverlay from "@/components/CurrentPositionOverlay";
 import GymMarker from "@/components/GymMarker";
 import GymPreview from "@/components/GymPreview";
 import Map from "@/components/Map";
@@ -106,6 +107,9 @@ export default function HomePage() {
             }}
           />
         ))}
+        <CurrentPositionOverlay
+          defaultPos={getCachedCurrentPosition() ?? CENTER_OF_SEOUL}
+        />
       </Map>
       <Sheet
         ref={compoundRefs([sheetRef, targetRef, elementRef])}

@@ -91,7 +91,7 @@ function Map({ onInit, onChangeBounds, children, className }: MapProps) {
           visible={isLoading}
           content={
             <div className={classNames.current_position_loader}>
-              <Spinner /> 현재 위치를 받아오는 중입니다...
+              <Spinner /> 현재 위치를 불러오는 중입니다...
             </div>
           }
         />

@@ -1,0 +1,8 @@
+.overlay {
+  height: 12px;
+  width: 12px;
+  border-radius: 100%;
+  background-color: #f22625;
+  outline: #f22625 solid 1px;
+  outline-offset: 2px;
+}
