@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Suspense, useRef, useState } from "react";
 
+import Avatar from "@/components/avatar/Avatar";
 import CurrentPositionOverlay from "@/components/CurrentPositionOverlay";
 import GymDetail from "@/components/GymDetail";
 import GymMarker from "@/components/GymMarker";
@@ -33,6 +34,7 @@ export default function HomePage() {
     longitude: 0,
     facilities: [],
   });
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const queryClient = useQueryClient();
   const { visibility, open, close } = useSheet();
   const sheetRef = useRef<HTMLDivElement | null>(null);
@@ -97,42 +99,57 @@ export default function HomePage() {
     fetchData();
   };
 
+  const handleClickLoginButton = () => {
+    setIsLoggedIn((il) => !il);
+  };
+
   return (
-    <main className={classNames.container}>
-      <Map
-        onInit={onInitMap}
-        onChangeBounds={onChangeBounds}
-        className={classNames.kakao_map}
-      >
-        {gymList.map((gym) => (
-          <GymMarker
-            key={gym.id}
-            gym={gym}
-            onClick={(gym) => {
-              setSelectedGym(gym);
-              open(30);
-              setSheetLayout("PREVIEW");
-            }}
+    <div>
+      <header className={classNames.gnb}>
+        {isLoggedIn ? (
+          <div>
+            <Avatar src={""} className={classNames.avatar_my} />
+          </div>
+        ) : (
+          <button onClick={handleClickLoginButton}>로그인</button>
+        )}
+      </header>
+      <main className={classNames.container}>
+        <Map
+          onInit={onInitMap}
+          onChangeBounds={onChangeBounds}
+          className={classNames.kakao_map}
+        >
+          {gymList.map((gym) => (
+            <GymMarker
+              key={gym.id}
+              gym={gym}
+              onClick={(gym) => {
+                setSelectedGym(gym);
+                open(30);
+                setSheetLayout("PREVIEW");
+              }}
+            />
+          ))}
+          <CurrentPositionOverlay
+            defaultPos={getCachedCurrentPosition() ?? CENTER_OF_SEOUL}
           />
-        ))}
-        <CurrentPositionOverlay
-          defaultPos={getCachedCurrentPosition() ?? CENTER_OF_SEOUL}
+        </Map>
+        <Sheet
+          ref={compoundRefs([sheetRef, targetRef, elementRef])}
+          content={
+            <Suspense fallback={<Loader />}>
+              {sheetLayout === "PREVIEW" ? (
+                <GymPreview gym={selectedGym} currentCoord={currentPosition} />
+              ) : (
+                <GymDetail gym={selectedGym} currentCoord={currentPosition} />
+              )}
+            </Suspense>
+          }
+          visibility={visibility}
         />
-      </Map>
-      <Sheet
-        ref={compoundRefs([sheetRef, targetRef, elementRef])}
-        content={
-          <Suspense fallback={<Loader />}>
-            {sheetLayout === "PREVIEW" ? (
-              <GymPreview gym={selectedGym} currentCoord={currentPosition} />
-            ) : (
-              <GymDetail gym={selectedGym} currentCoord={currentPosition} />
-            )}
-          </Suspense>
-        }
-        visibility={visibility}
-      />
-    </main>
+      </main>
+    </div>
   );
 }
 

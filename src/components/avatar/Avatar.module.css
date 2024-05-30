@@ -1,0 +1,15 @@
+.container {
+  height: 48px;
+  width: 48px;
+  border-radius: 100%;
+  box-shadow: 0 0 4px 0px rgba(50, 50, 50, 0.25);
+  overflow: hidden;
+  background-color: #fff;
+}
+
+.avatar {
+  height: 100%;
+  width: 100%;
+  border-radius: 100%;
+  object-fit: cover;
+}

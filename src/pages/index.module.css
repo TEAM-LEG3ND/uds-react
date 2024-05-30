@@ -1,3 +1,28 @@
+.layout {
+  height: 100%;
+  height: 100dvh;
+}
+
+.gnb {
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding-inline: 16px;
+  margin-inline: auto;
+  width: 100%;
+  height: 56px;
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  background-color: transparent;
+  z-index: 2;
+}
+
+.avatar_my {
+  width: 48px;
+  height: 48px;
+}
+
 .container {
   height: 100%;
   height: 100dvh;
