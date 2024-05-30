@@ -19,7 +19,10 @@ export const useGeolocation = (defaultPos: TPosition | (() => TPosition)) => {
             latitude: pos.coords.latitude,
             longitude: pos.coords.longitude,
           }),
-        (err) => console.error(err)
+        (err) => console.error(err),
+        {
+          timeout: 5000,
+        }
       );
     };
 

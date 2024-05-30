@@ -48,6 +48,7 @@ function Map({ onInit, onChangeBounds, children, className }: MapProps) {
         setIsLoading(true);
         const currentPosition = await getCurrentPositionPromise({
           signal: abortControllerRef.current?.signal,
+          timeout: 5000,
         });
 
         kakaoMap.setCenter(
