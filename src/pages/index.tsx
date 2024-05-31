@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Suspense, useRef, useState } from "react";
+import { Await, useLoaderData } from "react-router-dom";
 
 import Avatar from "@/components/avatar/Avatar";
 import CurrentPositionOverlay from "@/components/CurrentPositionOverlay";
@@ -10,6 +11,7 @@ import Map from "@/components/Map";
 import Sheet from "@/components/Sheet/Sheet";
 import { useSheet } from "@/components/Sheet/Sheet.hooks";
 import { CENTER_OF_SEOUL } from "@/constants";
+import { GetAuthMeResponse } from "@/effects/apis.model";
 import { useClickOutside } from "@/hooks/use-click-outside";
 import { useCurrentPositionQuery } from "@/hooks/use-geolocation";
 import useSwipe from "@/hooks/use-swipe";
@@ -34,7 +36,6 @@ export default function HomePage() {
     longitude: 0,
     facilities: [],
   });
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const queryClient = useQueryClient();
   const { visibility, open, close } = useSheet();
   const sheetRef = useRef<HTMLDivElement | null>(null);
@@ -51,6 +52,7 @@ export default function HomePage() {
       } else if (visibility === 30) close();
     },
   });
+  const { me } = useLoaderData() as { me: Promise<GetAuthMeResponse> };
 
   const onChangeBounds = async (boundary: kakao.maps.LatLngBounds) => {
     queryClient.cancelQueries({
@@ -99,20 +101,20 @@ export default function HomePage() {
     fetchData();
   };
 
-  const handleClickLoginButton = () => {
-    setIsLoggedIn((il) => !il);
-  };
-
   return (
     <div>
       <header className={classNames.gnb}>
-        {isLoggedIn ? (
-          <div>
-            <Avatar src={""} className={classNames.avatar_my} />
-          </div>
-        ) : (
-          <button onClick={handleClickLoginButton}>로그인</button>
-        )}
+        <Suspense fallback={<div></div>}>
+          <Await
+            resolve={me}
+            errorElement={
+              <a href={`${import.meta.env.VITE_API_ENDPOINT}/auth/login/local`}>
+                로그인
+              </a>
+            }
+            children={(resolvedMe) => <Avatar src={resolvedMe.picture} />}
+          />
+        </Suspense>
       </header>
       <main className={classNames.container}>
         <Map

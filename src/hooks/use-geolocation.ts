@@ -21,7 +21,7 @@ export const useGeolocation = (defaultPos: TPosition | (() => TPosition)) => {
           }),
         (err) => console.error(err),
         {
-          timeout: 5000,
+          timeout: 10000,
         }
       );
     };

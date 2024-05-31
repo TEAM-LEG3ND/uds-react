@@ -12,13 +12,13 @@ export default ({ mode }: UserConfig) => {
         "@": resolve(__dirname, "./src"),
       },
     },
-    server: {
-      proxy: {
-        "/api/v1": {
-          target: process.env.VITE_API_HOST,
-          changeOrigin: true,
-        },
-      },
-    },
+    // server: {
+    //   proxy: {
+    //     "/api/v1": {
+    //       target: process.env.VITE_API_HOST,
+    //       changeOrigin: true,
+    //     },
+    //   },
+    // },
   });
 };
