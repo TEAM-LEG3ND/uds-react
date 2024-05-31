@@ -11,6 +11,7 @@ import Map from "@/components/Map";
 import Sheet from "@/components/Sheet/Sheet";
 import { useSheet } from "@/components/Sheet/Sheet.hooks";
 import { CENTER_OF_SEOUL } from "@/constants";
+import { parseEnv } from "@/effects/apis";
 import { GetAuthMeResponse } from "@/effects/apis.model";
 import { useClickOutside } from "@/hooks/use-click-outside";
 import { useCurrentPositionQuery } from "@/hooks/use-geolocation";
@@ -108,7 +109,11 @@ export default function HomePage() {
           <Await
             resolve={me}
             errorElement={
-              <a href={`${import.meta.env.VITE_API_ENDPOINT}/auth/login/local`}>
+              <a
+                href={parseEnv(
+                  `${import.meta.env.VITE_API_ENDPOINT}/auth/login`
+                )}
+              >
                 로그인
               </a>
             }

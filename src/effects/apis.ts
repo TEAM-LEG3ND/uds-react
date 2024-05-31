@@ -18,7 +18,7 @@ const api = ky.create({
   retry: 0,
 });
 
-const paths = {
+export const paths = {
   auth: {
     login: "auth/login",
     callback: "auth/callback",
@@ -26,7 +26,7 @@ const paths = {
   },
 };
 
-const parseEnv = (path: string) => {
+export const parseEnv = (path: string) => {
   switch (import.meta.env.MODE) {
     case "development":
       return `${path}/local`;
@@ -54,8 +54,7 @@ export const useLoginQuery = () => {
 
 export const getLogin = async () => {
   try {
-    parseEnv(paths.auth.login);
-    const res = await api.get(paths.auth.login).json();
+    const res = await api.get(parseEnv(paths.auth.login)).json();
 
     return res;
   } catch (err) {
