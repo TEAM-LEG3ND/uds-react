@@ -2,11 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import ky, { HTTPError } from "ky";
 
 import {
-  GetAuthCallbackReqeust,
-  GetAuthCallbackResponse,
   getAuthCallbackResponse,
-  GetAuthMeResponse,
   getAuthMeResponse,
+  getLoginResponse,
+  TGetAuthCallbackReqeust,
+  TGetAuthCallbackResponse,
+  TGetAuthMeResponse,
 } from "@/effects/apis.model";
 
 const api = ky.create({
@@ -18,15 +19,15 @@ const api = ky.create({
   retry: 0,
 });
 
-export const paths = {
+const paths = {
   auth: {
-    login: "auth/login",
-    callback: "auth/callback",
-    me: "auth/me",
+    login: "v2/auth/login",
+    callback: "v1/auth/callback",
+    me: "v1/auth/me",
   },
 };
 
-export const parseEnv = (path: string) => {
+const parseEnv = (path: string) => {
   switch (import.meta.env.MODE) {
     case "development":
       return `${path}/local`;
@@ -37,7 +38,7 @@ export const parseEnv = (path: string) => {
   }
 };
 
-export const keys = {
+const keys = {
   auth: {
     login: ["auth", "login"],
     callback: ["auth", "callback"],
@@ -55,16 +56,21 @@ export const useLoginQuery = () => {
 export const getLogin = async () => {
   try {
     const res = await api.get(parseEnv(paths.auth.login)).json();
+    const login = getLoginResponse.parse(res);
 
-    return res;
+    return login;
   } catch (err) {
     console.error(err);
     throw err;
   }
 };
 
-export const useAuthCallbackQuery = (params: GetAuthCallbackReqeust) => {
-  return useQuery<GetAuthCallbackResponse, HTTPError, GetAuthCallbackResponse>({
+export const useAuthCallbackQuery = (params: TGetAuthCallbackReqeust) => {
+  return useQuery<
+    TGetAuthCallbackResponse,
+    HTTPError,
+    TGetAuthCallbackResponse
+  >({
     queryKey: keys.auth.callback,
     queryFn: () => getAuthCallback(params),
   });
@@ -73,10 +79,10 @@ export const useAuthCallbackQuery = (params: GetAuthCallbackReqeust) => {
 export const getAuthCallback = async ({
   state,
   code,
-}: GetAuthCallbackReqeust) => {
+}: TGetAuthCallbackReqeust) => {
   try {
     const res = await api
-      .get(parseEnv(paths.auth.callback), {
+      .get(paths.auth.callback, {
         searchParams: {
           state,
           code,
@@ -93,7 +99,7 @@ export const getAuthCallback = async ({
 };
 
 export const useAuthMeQuery = () => {
-  return useQuery<GetAuthMeResponse, HTTPError, GetAuthMeResponse>({
+  return useQuery<TGetAuthMeResponse, HTTPError, TGetAuthMeResponse>({
     queryKey: keys.auth.me,
     queryFn: () => getAuthMe(),
   });

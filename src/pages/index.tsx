@@ -11,8 +11,8 @@ import Map from "@/components/Map";
 import Sheet from "@/components/Sheet/Sheet";
 import { useSheet } from "@/components/Sheet/Sheet.hooks";
 import { CENTER_OF_SEOUL } from "@/constants";
-import { parseEnv } from "@/effects/apis";
-import { GetAuthMeResponse } from "@/effects/apis.model";
+import { getLogin } from "@/effects/apis";
+import { type TGetAuthMeResponse } from "@/effects/apis.model";
 import { useClickOutside } from "@/hooks/use-click-outside";
 import { useCurrentPositionQuery } from "@/hooks/use-geolocation";
 import useSwipe from "@/hooks/use-swipe";
@@ -53,7 +53,7 @@ export default function HomePage() {
       } else if (visibility === 30) close();
     },
   });
-  const { me } = useLoaderData() as { me: Promise<GetAuthMeResponse> };
+  const { me } = useLoaderData() as { me: Promise<TGetAuthMeResponse> };
 
   const onChangeBounds = async (boundary: kakao.maps.LatLngBounds) => {
     queryClient.cancelQueries({
@@ -89,7 +89,7 @@ export default function HomePage() {
         queryKey: ["spots", "current"],
         queryFn: async () => {
           const res = await fetch(
-            `${import.meta.env.VITE_API_ENDPOINT}/spots/boundary?swlat=${swLanLng.getLat()}&swlng=${swLanLng.getLng()}&nelat=${neLanLng.getLat()}&nelng=${neLanLng.getLng()}`
+            `${import.meta.env.VITE_API_ENDPOINT}/v1/spots/boundary?swlat=${swLanLng.getLat()}&swlng=${swLanLng.getLng()}&nelat=${neLanLng.getLat()}&nelng=${neLanLng.getLng()}`
           );
           const data = await res.json();
 
@@ -109,13 +109,14 @@ export default function HomePage() {
           <Await
             resolve={me}
             errorElement={
-              <a
-                href={parseEnv(
-                  `${import.meta.env.VITE_API_ENDPOINT}/auth/login`
-                )}
+              <button
+                onClick={async () => {
+                  const { redirect_uri } = await getLogin();
+                  location.href = redirect_uri;
+                }}
               >
                 로그인
-              </a>
+              </button>
             }
             children={(resolvedMe) => <Avatar src={resolvedMe.picture} />}
           />
