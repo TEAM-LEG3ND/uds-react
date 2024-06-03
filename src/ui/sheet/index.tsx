@@ -11,7 +11,7 @@ import { createPortal } from "react-dom";
 import usePresence from "@/hooks/use-presence";
 import { compoundRefs } from "@/utils";
 
-import classNames from "./Sheet.module.css";
+import classNames from "./index.module.css";
 
 interface RootProps {
   visibility: number;

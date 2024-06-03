@@ -2,8 +2,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Suspense, useRef, useState } from "react";
 
 import { CENTER_OF_SEOUL } from "@/constants";
+import { useCurrentPositionQuery } from "@/effects/geolocation";
 import { useClickOutside } from "@/hooks/use-click-outside";
-import { useCurrentPositionQuery } from "@/hooks/use-geolocation";
 import useSwipe from "@/hooks/use-swipe";
 import classNames from "@/pages/index.module.css";
 import { TGym } from "@/types/models";
@@ -12,8 +12,8 @@ import GymDetail from "@/ui/GymDetail";
 import GymMarker from "@/ui/GymMarker";
 import GymPreview from "@/ui/GymPreview";
 import Map from "@/ui/Map";
-import Sheet from "@/ui/sheet/Sheet";
-import { useSheet } from "@/ui/sheet/Sheet.hooks";
+import Sheet from "@/ui/sheet";
+import { useSheet } from "@/ui/sheet/hooks";
 import { compoundRefs, getCachedCurrentPosition } from "@/utils";
 
 type TSheetLayout = "PREVIEW" | "DETAIL";

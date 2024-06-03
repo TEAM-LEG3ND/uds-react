@@ -3,7 +3,7 @@ import { Await, Outlet, useLoaderData } from "react-router-dom";
 
 import { TGetAuthMeResponse } from "@/effects/apis/model";
 import Login from "@/features/auth/Login";
-import Avatar from "@/ui/avatar/Avatar";
+import Avatar from "@/ui/avatar";
 import GNB from "@/ui/layout/GNB";
 
 import classNames from "./Layout.module.css";

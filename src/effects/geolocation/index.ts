@@ -3,7 +3,9 @@ import { useEffect, useRef, useState } from "react";
 
 import { TPosition } from "@/types/models";
 
-export const useGeolocation = (defaultPos: TPosition | (() => TPosition)) => {
+export const useGeolocationWatcher = (
+  defaultPos: TPosition | (() => TPosition)
+) => {
   const [currentPosition, setCurrentPosition] = useState<TPosition>(defaultPos);
   const watchIdRef = useRef(0);
 

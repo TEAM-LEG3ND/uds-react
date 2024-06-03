@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import classNames from "@/ui/CurrentPositionOverlay.module.css";
 import { useMap } from "@/ui/MapProvider";
-import { useGeolocation } from "@/hooks/use-geolocation";
+import { useGeolocationWatcher } from "@/effects/geolocation";
 import { TPosition } from "@/types/models";
 
 interface Props {
@@ -11,7 +11,7 @@ interface Props {
 
 export default function CurrentPositionOverlay({ defaultPos }: Props) {
   const map = useMap();
-  const { currentPosition } = useGeolocation(defaultPos);
+  const { currentPosition } = useGeolocationWatcher(defaultPos);
   const [overlay, setOverlay] = useState<kakao.maps.CustomOverlay | null>(null);
 
   useEffect(() => {

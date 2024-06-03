@@ -1,8 +1,9 @@
 import { ReactNode } from "react";
 import { createPortal } from "react-dom";
 
-import classNames from "@/ui/toast/Toast.module.css";
 import usePresence from "@/hooks/use-presence";
+
+import classNames from "./index.module.css";
 
 interface Props {
   visible: boolean;
