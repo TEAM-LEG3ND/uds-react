@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { createPortal } from "react-dom";
 
-import classNames from "@/components/toast/Toast.module.css";
+import classNames from "@/ui/toast/Toast.module.css";
 import usePresence from "@/hooks/use-presence";
 
 interface Props {

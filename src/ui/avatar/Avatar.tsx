@@ -1,6 +1,6 @@
 import { ComponentPropsWithoutRef } from "react";
 
-import classNames from "@/components/avatar/Avatar.module.css";
+import classNames from "@/ui/avatar/Avatar.module.css";
 
 interface Props extends ComponentPropsWithoutRef<"div"> {
   src: string;

@@ -1,11 +1,11 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 
-import { Spinner } from "@/components/Loader";
-import classNames from "@/components/Map.module.css";
-import { MapProvider } from "@/components/MapProvider";
-import Toast from "@/components/toast/Toast";
 import { CENTER_OF_SEOUL } from "@/constants";
 import { getCurrentPositionPromise } from "@/hooks/use-geolocation";
+import { Spinner } from "@/ui/Loader";
+import classNames from "@/ui/Map.module.css";
+import { MapProvider } from "@/ui/MapProvider";
+import Toast from "@/ui/toast/Toast";
 import { getCachedCurrentPosition, setCurrentPositionCache } from "@/utils";
 interface MapProps {
   onInit: (map: kakao.maps.Map) => void;

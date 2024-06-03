@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
-import { Spinner } from "@/components/Loader";
 import { useAuthCallbackQuery } from "@/effects/apis";
 import classNames from "@/pages/auth-callback.module.css";
+import { Spinner } from "@/ui/Loader";
 
 export default function AuthCallbackPage() {
   const [searchParams] = useSearchParams();

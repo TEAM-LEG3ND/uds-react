@@ -1,23 +1,19 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Suspense, useRef, useState } from "react";
-import { Await, useLoaderData } from "react-router-dom";
 
-import Avatar from "@/components/avatar/Avatar";
-import CurrentPositionOverlay from "@/components/CurrentPositionOverlay";
-import GymDetail from "@/components/GymDetail";
-import GymMarker from "@/components/GymMarker";
-import GymPreview from "@/components/GymPreview";
-import Map from "@/components/Map";
-import Sheet from "@/components/Sheet/Sheet";
-import { useSheet } from "@/components/Sheet/Sheet.hooks";
 import { CENTER_OF_SEOUL } from "@/constants";
-import { getLogin } from "@/effects/apis";
-import { type TGetAuthMeResponse } from "@/effects/apis.model";
 import { useClickOutside } from "@/hooks/use-click-outside";
 import { useCurrentPositionQuery } from "@/hooks/use-geolocation";
 import useSwipe from "@/hooks/use-swipe";
 import classNames from "@/pages/index.module.css";
 import { TGym } from "@/types/models";
+import CurrentPositionOverlay from "@/ui/CurrentPositionOverlay";
+import GymDetail from "@/ui/GymDetail";
+import GymMarker from "@/ui/GymMarker";
+import GymPreview from "@/ui/GymPreview";
+import Map from "@/ui/Map";
+import Sheet from "@/ui/Sheet/Sheet";
+import { useSheet } from "@/ui/Sheet/Sheet.hooks";
 import { compoundRefs, getCachedCurrentPosition } from "@/utils";
 
 type TSheetLayout = "PREVIEW" | "DETAIL";
@@ -53,7 +49,6 @@ export default function HomePage() {
       } else if (visibility === 30) close();
     },
   });
-  const { me } = useLoaderData() as { me: Promise<TGetAuthMeResponse> };
 
   const onChangeBounds = async (boundary: kakao.maps.LatLngBounds) => {
     queryClient.cancelQueries({
@@ -103,61 +98,41 @@ export default function HomePage() {
   };
 
   return (
-    <div>
-      <header className={classNames.gnb}>
-        <Suspense fallback={<div></div>}>
-          <Await
-            resolve={me}
-            errorElement={
-              <button
-                onClick={async () => {
-                  const { redirect_uri } = await getLogin();
-                  location.href = redirect_uri;
-                }}
-              >
-                로그인
-              </button>
-            }
-            children={(resolvedMe) => <Avatar src={resolvedMe.picture} />}
+    <>
+      <Map
+        onInit={onInitMap}
+        onChangeBounds={onChangeBounds}
+        className={classNames.kakao_map}
+      >
+        {gymList.map((gym) => (
+          <GymMarker
+            key={gym.id}
+            gym={gym}
+            onClick={(gym) => {
+              setSelectedGym(gym);
+              open(30);
+              setSheetLayout("PREVIEW");
+            }}
           />
-        </Suspense>
-      </header>
-      <main className={classNames.container}>
-        <Map
-          onInit={onInitMap}
-          onChangeBounds={onChangeBounds}
-          className={classNames.kakao_map}
-        >
-          {gymList.map((gym) => (
-            <GymMarker
-              key={gym.id}
-              gym={gym}
-              onClick={(gym) => {
-                setSelectedGym(gym);
-                open(30);
-                setSheetLayout("PREVIEW");
-              }}
-            />
-          ))}
-          <CurrentPositionOverlay
-            defaultPos={getCachedCurrentPosition() ?? CENTER_OF_SEOUL}
-          />
-        </Map>
-        <Sheet
-          ref={compoundRefs([sheetRef, targetRef, elementRef])}
-          content={
-            <Suspense fallback={<Loader />}>
-              {sheetLayout === "PREVIEW" ? (
-                <GymPreview gym={selectedGym} currentCoord={currentPosition} />
-              ) : (
-                <GymDetail gym={selectedGym} currentCoord={currentPosition} />
-              )}
-            </Suspense>
-          }
-          visibility={visibility}
+        ))}
+        <CurrentPositionOverlay
+          defaultPos={getCachedCurrentPosition() ?? CENTER_OF_SEOUL}
         />
-      </main>
-    </div>
+      </Map>
+      <Sheet
+        ref={compoundRefs([sheetRef, targetRef, elementRef])}
+        content={
+          <Suspense fallback={<Loader />}>
+            {sheetLayout === "PREVIEW" ? (
+              <GymPreview gym={selectedGym} currentCoord={currentPosition} />
+            ) : (
+              <GymDetail gym={selectedGym} currentCoord={currentPosition} />
+            )}
+          </Suspense>
+        }
+        visibility={visibility}
+      />
+    </>
   );
 }
 

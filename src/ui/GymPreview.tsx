@@ -1,6 +1,6 @@
 import { useSuspenseQueries } from "@tanstack/react-query";
 
-import classNames from "@/components/GymPreview.module.css";
+import classNames from "@/ui/GymPreview.module.css";
 import { TGym } from "@/types/models";
 import {
   calculateDirectWTMDistance,

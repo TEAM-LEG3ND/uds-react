@@ -1,0 +1,25 @@
+.container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding-inline: 16px;
+  width: 100%;
+  height: 56px;
+  background-color: transparent;
+  z-index: 2;
+}
+
+.nav {
+  margin-inline: auto;
+  height: 100%;
+  width: 100%;
+  max-width: 1400px;
+  display: flex;
+  justify-content: between;
+  align-items: center;
+  overflow: hidden;
+}
+
+.right_section {
+  margin-left: auto;
+}

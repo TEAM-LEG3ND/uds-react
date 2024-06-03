@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-import { useMap } from "@/components/MapProvider";
+import { useMap } from "@/ui/MapProvider";
 import { TGym } from "@/types/models";
 
 interface Props {

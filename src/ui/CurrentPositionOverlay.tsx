@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-import classNames from "@/components/CurrentPositionOverlay.module.css";
-import { useMap } from "@/components/MapProvider";
+import classNames from "@/ui/CurrentPositionOverlay.module.css";
+import { useMap } from "@/ui/MapProvider";
 import { useGeolocation } from "@/hooks/use-geolocation";
 import { TPosition } from "@/types/models";
 
