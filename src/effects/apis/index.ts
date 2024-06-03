@@ -46,14 +46,14 @@ const keys = {
   },
 };
 
-export const useLoginQuery = () => {
+export const useAuthLoginQuery = () => {
   return useQuery<unknown, HTTPError, unknown>({
     queryKey: keys.auth.login,
-    queryFn: () => getLogin(),
+    queryFn: () => getAuthLogin(),
   });
 };
 
-export const getLogin = async () => {
+export const getAuthLogin = async () => {
   try {
     const res = await api.get(parseEnv(paths.auth.login)).json();
     const login = getLoginResponse.parse(res);

@@ -1,8 +1,8 @@
-import { getLogin } from "@/effects/apis";
+import { getAuthLogin } from "@/effects/apis";
 
 export default function Login() {
   const handleClickLoginButton = async () => {
-    const { redirect_uri } = await getLogin();
+    const { redirect_uri } = await getAuthLogin();
     location.href = redirect_uri;
   };
 
