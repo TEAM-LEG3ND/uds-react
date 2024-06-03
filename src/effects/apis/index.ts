@@ -8,7 +8,7 @@ import {
   TGetAuthCallbackReqeust,
   TGetAuthCallbackResponse,
   TGetAuthMeResponse,
-} from "@/effects/apis.model";
+} from "@/effects/apis/model";
 
 const api = ky.create({
   prefixUrl: import.meta.env.VITE_API_ENDPOINT,

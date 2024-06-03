@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { Await, Outlet, useLoaderData } from "react-router-dom";
 
-import { TGetAuthMeResponse } from "@/effects/apis.model";
+import { TGetAuthMeResponse } from "@/effects/apis/model";
 import Login from "@/features/auth/Login";
 import Avatar from "@/ui/avatar/Avatar";
 import GNB from "@/ui/layout/GNB";
