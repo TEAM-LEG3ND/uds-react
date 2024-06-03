@@ -12,8 +12,8 @@ import GymDetail from "@/ui/GymDetail";
 import GymMarker from "@/ui/GymMarker";
 import GymPreview from "@/ui/GymPreview";
 import Map from "@/ui/Map";
-import Sheet from "@/ui/Sheet/Sheet";
-import { useSheet } from "@/ui/Sheet/Sheet.hooks";
+import Sheet from "@/ui/sheet/Sheet";
+import { useSheet } from "@/ui/sheet/Sheet.hooks";
 import { compoundRefs, getCachedCurrentPosition } from "@/utils";
 
 type TSheetLayout = "PREVIEW" | "DETAIL";
@@ -61,7 +61,7 @@ export default function HomePage() {
         queryKey: [],
         queryFn: async () => {
           const res = await fetch(
-            `${import.meta.env.VITE_API_ENDPOINT}/spots/boundary?swlat=${swLanLng.getLat()}&swlng=${swLanLng.getLng()}&nelat=${neLanLng.getLat()}&nelng=${neLanLng.getLng()}`
+            `${import.meta.env.VITE_API_ENDPOINT}/v1/spots/boundary?swlat=${swLanLng.getLat()}&swlng=${swLanLng.getLng()}&nelat=${neLanLng.getLat()}&nelng=${neLanLng.getLng()}`
           );
           const data = await res.json();
 
