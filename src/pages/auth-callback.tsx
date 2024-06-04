@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { useAuthCallbackQuery } from "@/effects/apis";
 import classNames from "@/pages/auth-callback.module.css";
-import { Spinner } from "@/ui/Loader";
+import { Spinner } from "@/ui/loader";
 
 export default function AuthCallbackPage() {
   const [searchParams] = useSearchParams();
