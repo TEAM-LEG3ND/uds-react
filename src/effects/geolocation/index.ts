@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 
-import { TPosition } from "@/types/models";
+import { TPosition } from "@/models/spot";
 
 export const useGeolocationWatcher = (
   defaultPos: TPosition | (() => TPosition)

@@ -3,15 +3,15 @@ import { Suspense, useRef, useState } from "react";
 
 import { CENTER_OF_SEOUL } from "@/constants";
 import { useCurrentPositionQuery } from "@/effects/geolocation";
+import Map from "@/features/map/Map";
+import MyLocationTracker from "@/features/map/MyLocationTracker";
+import GymDetail from "@/features/spot/GymDetail";
+import GymMarker from "@/features/spot/GymMarker";
+import GymPreview from "@/features/spot/GymPreview";
 import { useClickOutside } from "@/hooks/use-click-outside";
 import useSwipe from "@/hooks/use-swipe";
+import { TGym } from "@/models/spot";
 import classNames from "@/pages/index.module.css";
-import { TGym } from "@/types/models";
-import CurrentPositionOverlay from "@/ui/CurrentPositionOverlay";
-import GymDetail from "@/ui/GymDetail";
-import GymMarker from "@/ui/GymMarker";
-import GymPreview from "@/ui/GymPreview";
-import Map from "@/ui/Map";
 import Sheet from "@/ui/sheet";
 import { useSheet } from "@/ui/sheet/hooks";
 import { compoundRefs, getCachedCurrentPosition } from "@/utils";
@@ -115,7 +115,7 @@ export default function HomePage() {
             }}
           />
         ))}
-        <CurrentPositionOverlay
+        <MyLocationTracker
           defaultPos={getCachedCurrentPosition() ?? CENTER_OF_SEOUL}
         />
       </Map>

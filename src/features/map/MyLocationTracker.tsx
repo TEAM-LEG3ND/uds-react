@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 
-import classNames from "@/ui/CurrentPositionOverlay.module.css";
-import { useMap } from "@/ui/MapProvider";
 import { useGeolocationWatcher } from "@/effects/geolocation";
-import { TPosition } from "@/types/models";
+import { useMap } from "@/features/map/MapProvider";
+import { TPosition } from "@/models/spot";
+
+import classNames from "./MyLocationTracker.module.css";
 
 interface Props {
   defaultPos: TPosition;
 }
 
-export default function CurrentPositionOverlay({ defaultPos }: Props) {
+export default function MyLocationTracker({ defaultPos }: Props) {
   const map = useMap();
   const { currentPosition } = useGeolocationWatcher(defaultPos);
   const [overlay, setOverlay] = useState<kakao.maps.CustomOverlay | null>(null);
@@ -18,7 +19,7 @@ export default function CurrentPositionOverlay({ defaultPos }: Props) {
     if (!map) return;
     const content = `<div class=${classNames.overlay} />`;
 
-    const currentPositionOverlay = new kakao.maps.CustomOverlay({
+    const myLocationTracker = new kakao.maps.CustomOverlay({
       position: new kakao.maps.LatLng(
         defaultPos.latitude,
         defaultPos.longitude
@@ -28,8 +29,8 @@ export default function CurrentPositionOverlay({ defaultPos }: Props) {
       zIndex: 1,
     });
 
-    setOverlay(currentPositionOverlay);
-    currentPositionOverlay.setMap(map);
+    setOverlay(myLocationTracker);
+    myLocationTracker.setMap(map);
   }, [defaultPos.latitude, defaultPos.longitude, map]);
 
   useEffect(() => {

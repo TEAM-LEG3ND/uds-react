@@ -1,12 +1,13 @@
 import { useSuspenseQueries } from "@tanstack/react-query";
 
-import classNames from "@/ui/GymPreview.module.css";
-import { TGym } from "@/types/models";
+import { TGym } from "@/models/spot";
 import {
   calculateDirectWTMDistance,
   takeTopN,
   translateWGS84ToWTMAsync,
 } from "@/utils";
+
+import classNames from "./GymPreview.module.css";
 
 interface Props {
   gym: TGym;

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
-import { useMap } from "@/ui/MapProvider";
-import { TGym } from "@/types/models";
+import { useMap } from "@/features/map/MapProvider";
+import { TGym } from "@/models/spot";
 
 interface Props {
   gym: TGym;

@@ -1,6 +1,6 @@
 import { MutableRefObject, Ref } from "react";
 
-import { type TPosition } from "@/types/models";
+import { type TPosition } from "@/models/spot";
 
 export const compoundRefs =
   <T>(refs: Ref<T>[]) =>

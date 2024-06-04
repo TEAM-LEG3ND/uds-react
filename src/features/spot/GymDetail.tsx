@@ -1,9 +1,10 @@
 import { useSuspenseQueries } from "@tanstack/react-query";
 import { MapPin } from "lucide-react";
 
-import classNames from "@/ui/GymDetail.module.css";
-import { TGym, TPosition } from "@/types/models";
+import { TGym, TPosition } from "@/models/spot";
 import { calculateDirectWTMDistance, translateWGS84ToWTMAsync } from "@/utils";
+
+import classNames from "./GymDetail.module.css";
 
 interface Props {
   gym: TGym;
