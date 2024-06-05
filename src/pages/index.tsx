@@ -2,9 +2,9 @@ import { Suspense, useRef, useState } from "react";
 
 import { CENTER_OF_SEOUL } from "@/constants";
 import { useSpotsBoundaryAsyncQuery } from "@/effects/apis";
-import { useMyPositionQuery } from "@/effects/geolocation";
+import { useMyPositionWatcher } from "@/effects/geolocation";
 import Map from "@/features/map/Map";
-import MyLocationTracker from "@/features/map/MyLocationTracker";
+import MyPositionTracker from "@/features/map/MyPositionTracker";
 import GymDetail from "@/features/spot/GymDetail";
 import GymMarker from "@/features/spot/GymMarker";
 import GymPreview from "@/features/spot/GymPreview";
@@ -19,10 +19,10 @@ import { compoundRefs, getMyPositionCache } from "@/utils";
 
 type TSheetLayout = "PREVIEW" | "DETAIL";
 
+const initialPosition = getMyPositionCache() ?? CENTER_OF_SEOUL;
+
 export default function HomePage() {
-  const { data: myPosition } = useMyPositionQuery(
-    getMyPositionCache() ?? CENTER_OF_SEOUL
-  );
+  const { myPosition } = useMyPositionWatcher(initialPosition);
   const [gymList, setGymList] = useState<TGym[]>([]);
   const [sheetLayout, setSheetLayout] = useState<TSheetLayout>("PREVIEW");
   const [selectedGym, setSelectedGym] = useState<TGym>({
@@ -89,8 +89,9 @@ export default function HomePage() {
             }}
           />
         ))}
-        <MyLocationTracker
-          defaultPos={getMyPositionCache() ?? CENTER_OF_SEOUL}
+        <MyPositionTracker
+          initialPosition={initialPosition}
+          myPosition={myPosition}
         />
       </Map>
       <Sheet
