@@ -34,7 +34,7 @@ function Map({ onInit, onChangeBounds, children, className }: MapProps) {
         initialPosition.latitude,
         initialPosition.longitude
       ),
-      level: 2,
+      level: 4,
       draggable: true,
     });
     setKakaoMap(map);
