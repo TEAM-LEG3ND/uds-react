@@ -99,9 +99,9 @@ export default function HomePage() {
         content={
           <Suspense fallback={<Loader />}>
             {sheetLayout === "PREVIEW" ? (
-              <GymPreview gym={selectedGym} currentCoord={myPosition} />
+              <GymPreview gym={selectedGym} myPosition={myPosition} />
             ) : (
-              <GymDetail gym={selectedGym} currentCoord={myPosition} />
+              <GymDetail gym={selectedGym} myPosition={myPosition} />
             )}
           </Suspense>
         }

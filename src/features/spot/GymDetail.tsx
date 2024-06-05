@@ -8,13 +8,13 @@ import classNames from "./GymDetail.module.css";
 
 interface Props {
   gym: TGym;
-  currentCoord: TPosition;
+  myPosition: TPosition;
 }
 
-export default function GymDetail({ gym, currentCoord }: Props) {
+export default function GymDetail({ gym, myPosition }: Props) {
   const [{ data: wtmCur }, { data: wtmDest }] = useSuspenseQueries({
     queries: [
-      currentCoord,
+      myPosition,
       { latitude: gym.latitude, longitude: gym.longitude },
     ].map((coord) => ({
       queryKey: ["translate", "coord", coord.latitude, coord.longitude],

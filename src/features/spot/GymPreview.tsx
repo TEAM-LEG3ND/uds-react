@@ -1,6 +1,6 @@
 import { useSuspenseQueries } from "@tanstack/react-query";
 
-import { TGym } from "@/models/spot";
+import { TGym, TPosition } from "@/models/spot";
 import {
   calculateDirectWTMDistance,
   takeTopN,
@@ -11,16 +11,13 @@ import classNames from "./GymPreview.module.css";
 
 interface Props {
   gym: TGym;
-  currentCoord: {
-    latitude: number;
-    longitude: number;
-  };
+  myPosition: TPosition;
 }
 
-function GymPreview({ gym, currentCoord }: Props) {
+function GymPreview({ gym, myPosition }: Props) {
   const [{ data: wtmCur }, { data: wtmDest }] = useSuspenseQueries({
     queries: [
-      currentCoord,
+      myPosition,
       { latitude: gym.latitude, longitude: gym.longitude },
     ].map((coord) => ({
       queryKey: ["translate", "coord", coord.latitude, coord.longitude],
