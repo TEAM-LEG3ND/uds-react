@@ -3,6 +3,7 @@ import { ReactNode, useEffect, useRef, useState } from "react";
 import { CENTER_OF_SEOUL } from "@/constants";
 import { getCurrentPositionPromise } from "@/effects/geolocation";
 import { MapProvider } from "@/features/map/MapProvider";
+import { TBoundary } from "@/models/map";
 import { Spinner } from "@/ui/loader";
 import Toast from "@/ui/toast";
 import { getCachedCurrentPosition, setCurrentPositionCache } from "@/utils";
@@ -11,7 +12,7 @@ import classNames from "./Map.module.css";
 
 interface MapProps {
   onInit: (map: kakao.maps.Map) => void;
-  onChangeBounds: (boundary: kakao.maps.LatLngBounds) => void;
+  onChangeBounds: (boundary: TBoundary) => void;
   children?: ReactNode;
   className: string;
 }
@@ -75,7 +76,17 @@ function Map({ onInit, onChangeBounds, children, className }: MapProps) {
     if (!kakaoMap) return;
 
     const changeBoundsListener = () => {
-      onChangeBounds(kakaoMap.getBounds());
+      const bounds = kakaoMap.getBounds();
+      const swLatLng = bounds.getSouthWest();
+      const neLatLng = bounds.getNorthEast();
+      const boundary: TBoundary = {
+        swlat: swLatLng.getLat(),
+        swlng: swLatLng.getLng(),
+        nelat: neLatLng.getLat(),
+        nelng: neLatLng.getLng(),
+      };
+
+      onChangeBounds(boundary);
       abortControllerRef.current && abortControllerRef.current.abort();
     };
 

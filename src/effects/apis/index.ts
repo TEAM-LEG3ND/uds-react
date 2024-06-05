@@ -1,13 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import ky, { HTTPError } from "ky";
 
 import {
   getAuthCallbackResponse,
   getAuthMeResponse,
   getLoginResponse,
+  getSpotsBoundaryResponse,
+  getSpotsResponse,
   TGetAuthCallbackReqeust,
   TGetAuthCallbackResponse,
   TGetAuthMeResponse,
+  TGetSpotsBoundaryRequest,
 } from "@/effects/apis/model";
 
 const api = ky.create({
@@ -24,6 +27,10 @@ const paths = {
     login: "v2/auth/login",
     callback: "v1/auth/callback",
     me: "v1/auth/me",
+  },
+  spots: {
+    index: "v1/spots",
+    boundary: "v1/spots/boundary",
   },
 };
 
@@ -43,6 +50,20 @@ const keys = {
     login: ["auth", "login"],
     callback: ["auth", "callback"],
     me: ["auth", "me"],
+  },
+  spot: {
+    index: ["spots"],
+    boundary: ({
+      swlat,
+      swlng,
+      nelat,
+      nelng,
+    }: {
+      swlat: number;
+      swlng: number;
+      nelat: number;
+      nelng: number;
+    }) => ["spots", "boundary", swlat, swlng, nelat, nelng],
   },
 };
 
@@ -115,4 +136,51 @@ export const getAuthMe = async () => {
     console.error(err);
     throw err;
   }
+};
+
+export const getSpots = async () => {
+  try {
+    const res = await api.get(paths.spots.index).json();
+    const spots = getSpotsResponse.parse(res);
+
+    return spots;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+export const getSpotsBoundary = async (params: TGetSpotsBoundaryRequest) => {
+  try {
+    const res = await api
+      .get(paths.spots.index, {
+        searchParams: params,
+      })
+      .json();
+    const spots = getSpotsBoundaryResponse.parse(res);
+
+    return spots;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+export const useSpotsBoundaryQuery = (params: TGetSpotsBoundaryRequest) => {
+  return useQuery({
+    queryKey: keys.spot.boundary(params),
+    queryFn: () => getSpotsBoundary(params),
+  });
+};
+
+export const useSpotsBoundaryAsyncQuery = () => {
+  const queryClient = useQueryClient();
+
+  return {
+    getSpotsBoundaryAsync: (params: TGetSpotsBoundaryRequest) =>
+      queryClient.fetchQuery({
+        queryKey: keys.spot.boundary(params),
+        queryFn: () => getSpotsBoundary(params),
+      }),
+  };
 };

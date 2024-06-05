@@ -1,7 +1,7 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { Suspense, useRef, useState } from "react";
 
 import { CENTER_OF_SEOUL } from "@/constants";
+import { useSpotsBoundaryAsyncQuery } from "@/effects/apis";
 import { useCurrentPositionQuery } from "@/effects/geolocation";
 import Map from "@/features/map/Map";
 import MyLocationTracker from "@/features/map/MyLocationTracker";
@@ -10,6 +10,7 @@ import GymMarker from "@/features/spot/GymMarker";
 import GymPreview from "@/features/spot/GymPreview";
 import { useClickOutside } from "@/hooks/use-click-outside";
 import useSwipe from "@/hooks/use-swipe";
+import { TBoundary } from "@/models/map";
 import { TGym } from "@/models/spot";
 import classNames from "@/pages/index.module.css";
 import Sheet from "@/ui/sheet";
@@ -33,7 +34,6 @@ export default function HomePage() {
     longitude: 0,
     facilities: [],
   });
-  const queryClient = useQueryClient();
   const { visibility, open, close } = useSheet();
   const sheetRef = useRef<HTMLDivElement | null>(null);
   const { targetRef } = useClickOutside<HTMLDivElement>(() => close());
@@ -49,52 +49,26 @@ export default function HomePage() {
       } else if (visibility === 30) close();
     },
   });
+  const { getSpotsBoundaryAsync } = useSpotsBoundaryAsyncQuery();
 
-  const onChangeBounds = async (boundary: kakao.maps.LatLngBounds) => {
-    queryClient.cancelQueries({
-      queryKey: ["spots", "current"],
-    });
-    const swLanLng = boundary.getSouthWest();
-    const neLanLng = boundary.getNorthEast();
-    const fetchData = async () => {
-      const data = await queryClient.fetchQuery({
-        queryKey: [],
-        queryFn: async () => {
-          const res = await fetch(
-            `${import.meta.env.VITE_API_ENDPOINT}/v1/spots/boundary?swlat=${swLanLng.getLat()}&swlng=${swLanLng.getLng()}&nelat=${neLanLng.getLat()}&nelng=${neLanLng.getLng()}`
-          );
-          const data = await res.json();
-
-          return data;
-        },
-      });
-      setGymList(data);
-    };
-
-    fetchData();
+  const onChangeBounds = async (boundary: TBoundary) => {
+    const gymList = await getSpotsBoundaryAsync(boundary);
+    setGymList(gymList);
   };
 
-  const onInitMap = (map: kakao.maps.Map) => {
-    const boundary = map.getBounds();
-    const swLanLng = boundary.getSouthWest();
-    const neLanLng = boundary.getNorthEast();
-
-    const fetchData = async () => {
-      const gymList = await queryClient.fetchQuery({
-        queryKey: ["spots", "current"],
-        queryFn: async () => {
-          const res = await fetch(
-            `${import.meta.env.VITE_API_ENDPOINT}/v1/spots/boundary?swlat=${swLanLng.getLat()}&swlng=${swLanLng.getLng()}&nelat=${neLanLng.getLat()}&nelng=${neLanLng.getLng()}`
-          );
-          const data = await res.json();
-
-          return data;
-        },
-      });
-
-      setGymList(gymList);
+  const onInitMap = async (map: kakao.maps.Map) => {
+    const bounds = map.getBounds();
+    const swLatLng = bounds.getSouthWest();
+    const neLatLng = bounds.getNorthEast();
+    const boundary: TBoundary = {
+      swlat: swLatLng.getLat(),
+      swlng: swLatLng.getLng(),
+      nelat: neLatLng.getLat(),
+      nelng: neLatLng.getLng(),
     };
-    fetchData();
+
+    const gymList = await getSpotsBoundaryAsync(boundary);
+    setGymList(gymList);
   };
 
   return (
