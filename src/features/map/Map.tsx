@@ -1,47 +1,35 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 
-import { CENTER_OF_SEOUL } from "@/constants";
 import { getMyPositionAsync } from "@/effects/geolocation";
 import { MapProvider } from "@/features/map/MapProvider";
 import useAbortController from "@/hooks/use-abort-controller";
 import { TBoundary } from "@/models/map";
+import { TPosition } from "@/models/spot";
 import { Spinner } from "@/ui/loader";
 import Toast from "@/ui/toast";
-import { getMyPositionCache, setMyPositionCache } from "@/utils";
+import { setMyPositionCache } from "@/utils";
 
 import classNames from "./Map.module.css";
 
 interface MapProps {
+  initialPosition: TPosition;
   onInit: (map: kakao.maps.Map) => void;
   onChangeBounds: (boundary: TBoundary) => void;
   children?: ReactNode;
   className: string;
 }
 
-function Map({ onInit, onChangeBounds, children, className }: MapProps) {
-  const [kakaoMap, setKakaoMap] = useState<kakao.maps.Map | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const onInitializeRef = useRef(onInit);
-  const [isLoading, setIsLoading] = useState(false);
+function Map({
+  initialPosition,
+  children,
+  className,
+  onInit,
+  onChangeBounds,
+}: MapProps) {
+  const { kakaoMap, containerRef } = useKakaoMap(initialPosition);
   const { abort, abortify, reset: resetAbort } = useAbortController();
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const initialPosition = getMyPositionCache() ?? CENTER_OF_SEOUL;
-
-    const map = new kakao.maps.Map(containerRef.current, {
-      center: new kakao.maps.LatLng(
-        initialPosition.latitude,
-        initialPosition.longitude
-      ),
-      level: 4,
-      draggable: true,
-    });
-    setKakaoMap(map);
-
-    onInitializeRef.current && onInitializeRef.current(map);
-  }, []);
+  const [isLoading, setIsLoading] = useState(false);
+  const onInitializeRef = useRef(onInit);
 
   useEffect(() => {
     if (!kakaoMap) return;
@@ -56,8 +44,8 @@ function Map({ onInit, onChangeBounds, children, className }: MapProps) {
         kakaoMap.setCenter(
           new kakao.maps.LatLng(myPosition.latitude, myPosition.longitude)
         );
-
         setMyPositionCache(myPosition);
+        onInitializeRef.current && onInitializeRef.current(kakaoMap);
       } catch (err) {
         console.error(err);
       } finally {
@@ -109,5 +97,28 @@ function Map({ onInit, onChangeBounds, children, className }: MapProps) {
     </div>
   );
 }
+
+const useKakaoMap = (initialPosition: TPosition) => {
+  const kakaoMapRef = useRef<kakao.maps.Map | null>(null);
+
+  const mapContainerRefCallback = (node: HTMLDivElement | null) => {
+    if (!node || kakaoMapRef.current) return;
+
+    const map = new kakao.maps.Map(node, {
+      center: new kakao.maps.LatLng(
+        initialPosition.latitude,
+        initialPosition.longitude
+      ),
+      level: 4,
+      draggable: true,
+    });
+    kakaoMapRef.current = map;
+  };
+
+  return {
+    kakaoMap: kakaoMapRef.current,
+    containerRef: mapContainerRefCallback,
+  };
+};
 
 export default Map;

@@ -74,6 +74,7 @@ export default function HomePage() {
   return (
     <>
       <Map
+        initialPosition={initialPosition}
         onInit={onInitMap}
         onChangeBounds={onChangeBounds}
         className={classNames.kakao_map}
