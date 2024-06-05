@@ -1,12 +1,12 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 
 import { CENTER_OF_SEOUL } from "@/constants";
-import { getMyPositionPromise } from "@/effects/geolocation";
+import { getMyPositionAsync } from "@/effects/geolocation";
 import { MapProvider } from "@/features/map/MapProvider";
 import { TBoundary } from "@/models/map";
 import { Spinner } from "@/ui/loader";
 import Toast from "@/ui/toast";
-import { getMyPositionCache, setMyPositionCache } from "@/utils";
+import { abortify, getMyPositionCache, setMyPositionCache } from "@/utils";
 
 import classNames from "./Map.module.css";
 
@@ -47,10 +47,13 @@ function Map({ onInit, onChangeBounds, children, className }: MapProps) {
     abortControllerRef.current = new AbortController();
 
     const getMyPosition = async () => {
+      if (!abortControllerRef.current) return;
       try {
         setIsLoading(true);
-        const myPosition = await getMyPositionPromise({
-          signal: abortControllerRef.current?.signal,
+        const myPosition = await abortify(
+          abortControllerRef.current.signal,
+          getMyPositionAsync
+        )({
           timeout: 10000,
         });
 

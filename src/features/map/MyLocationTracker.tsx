@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { useGeolocationWatcher } from "@/effects/geolocation";
+import { useMyPositionWatcher } from "@/effects/geolocation";
 import { useMap } from "@/features/map/MapProvider";
 import { TPosition } from "@/models/spot";
 
@@ -12,7 +12,7 @@ interface Props {
 
 export default function MyLocationTracker({ defaultPos }: Props) {
   const map = useMap();
-  const { currentPosition } = useGeolocationWatcher(defaultPos);
+  const { myPosition } = useMyPositionWatcher(defaultPos);
   const [overlay, setOverlay] = useState<kakao.maps.CustomOverlay | null>(null);
 
   useEffect(() => {
@@ -37,9 +37,9 @@ export default function MyLocationTracker({ defaultPos }: Props) {
     if (!overlay) return;
 
     overlay.setPosition(
-      new kakao.maps.LatLng(currentPosition.latitude, currentPosition.longitude)
+      new kakao.maps.LatLng(myPosition.latitude, myPosition.longitude)
     );
-  }, [overlay, currentPosition.latitude, currentPosition.longitude]);
+  }, [overlay, myPosition.latitude, myPosition.longitude]);
 
   return null;
 }

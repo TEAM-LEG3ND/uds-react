@@ -40,21 +40,13 @@ export const useMyPositionWatcher = (
   return { myPosition };
 };
 
-export const getMyPositionPromise = (
-  options?: PositionOptions & { signal?: AbortSignal }
-) =>
+export const getMyPositionAsync = (options?: PositionOptions) =>
   new Promise<TPosition>((resolve, reject) => {
-    if (options?.signal?.aborted) reject(options.signal.reason);
-
     navigator.geolocation.getCurrentPosition(
       (pos) => resolve(pos.coords),
       (err) => reject(err),
       options
     );
-
-    options?.signal?.addEventListener("abort", () => {
-      reject(options.signal?.reason);
-    });
   });
 
 export const useMyPositionQuery = (
@@ -63,7 +55,7 @@ export const useMyPositionQuery = (
 ) => {
   return useQuery({
     queryKey: ["geolocation", "current"],
-    queryFn: () => getMyPositionPromise(options),
+    queryFn: () => getMyPositionAsync(options),
     staleTime: 30000,
     initialData: defaultPos,
   });
