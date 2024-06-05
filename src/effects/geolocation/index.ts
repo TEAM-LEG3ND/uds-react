@@ -3,10 +3,10 @@ import { useEffect, useRef, useState } from "react";
 
 import { TPosition } from "@/models/spot";
 
-export const useGeolocationWatcher = (
+export const useMyPositionWatcher = (
   defaultPos: TPosition | (() => TPosition)
 ) => {
-  const [currentPosition, setCurrentPosition] = useState<TPosition>(defaultPos);
+  const [myPosition, setMyPosition] = useState<TPosition>(defaultPos);
   const watchIdRef = useRef(0);
 
   useEffect(() => {
@@ -17,7 +17,7 @@ export const useGeolocationWatcher = (
       }
       watchIdRef.current = navigator.geolocation.watchPosition(
         (pos) =>
-          setCurrentPosition({
+          setMyPosition({
             latitude: pos.coords.latitude,
             longitude: pos.coords.longitude,
           }),
@@ -37,10 +37,10 @@ export const useGeolocationWatcher = (
     return () => stop();
   }, []);
 
-  return { currentPosition };
+  return { myPosition };
 };
 
-export const getCurrentPositionPromise = (
+export const getMyPositionPromise = (
   options?: PositionOptions & { signal?: AbortSignal }
 ) =>
   new Promise<TPosition>((resolve, reject) => {
@@ -57,13 +57,13 @@ export const getCurrentPositionPromise = (
     });
   });
 
-export const useCurrentPositionQuery = (
+export const useMyPositionQuery = (
   defaultPos: TPosition,
   options?: PositionOptions & { signal: AbortSignal }
 ) => {
   return useQuery({
     queryKey: ["geolocation", "current"],
-    queryFn: () => getCurrentPositionPromise(options),
+    queryFn: () => getMyPositionPromise(options),
     staleTime: 30000,
     initialData: defaultPos,
   });

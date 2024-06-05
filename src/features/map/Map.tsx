@@ -1,12 +1,12 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 
 import { CENTER_OF_SEOUL } from "@/constants";
-import { getCurrentPositionPromise } from "@/effects/geolocation";
+import { getMyPositionPromise } from "@/effects/geolocation";
 import { MapProvider } from "@/features/map/MapProvider";
 import { TBoundary } from "@/models/map";
 import { Spinner } from "@/ui/loader";
 import Toast from "@/ui/toast";
-import { getCachedCurrentPosition, setCurrentPositionCache } from "@/utils";
+import { getMyPositionCache, setMyPositionCache } from "@/utils";
 
 import classNames from "./Map.module.css";
 
@@ -27,7 +27,7 @@ function Map({ onInit, onChangeBounds, children, className }: MapProps) {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const initialPosition = getCachedCurrentPosition() ?? CENTER_OF_SEOUL;
+    const initialPosition = getMyPositionCache() ?? CENTER_OF_SEOUL;
 
     const map = new kakao.maps.Map(containerRef.current, {
       center: new kakao.maps.LatLng(
@@ -46,22 +46,19 @@ function Map({ onInit, onChangeBounds, children, className }: MapProps) {
     if (!kakaoMap) return;
     abortControllerRef.current = new AbortController();
 
-    const getCurrentPosition = async () => {
+    const getMyPosition = async () => {
       try {
         setIsLoading(true);
-        const currentPosition = await getCurrentPositionPromise({
+        const myPosition = await getMyPositionPromise({
           signal: abortControllerRef.current?.signal,
           timeout: 10000,
         });
 
         kakaoMap.setCenter(
-          new kakao.maps.LatLng(
-            currentPosition.latitude,
-            currentPosition.longitude
-          )
+          new kakao.maps.LatLng(myPosition.latitude, myPosition.longitude)
         );
 
-        setCurrentPositionCache(currentPosition);
+        setMyPositionCache(myPosition);
       } catch (err) {
         console.error(err);
       } finally {
@@ -69,7 +66,7 @@ function Map({ onInit, onChangeBounds, children, className }: MapProps) {
         abortControllerRef.current = null;
       }
     };
-    getCurrentPosition();
+    getMyPosition();
   }, [kakaoMap]);
 
   useEffect(() => {

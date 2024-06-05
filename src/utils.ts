@@ -63,7 +63,7 @@ const cacheKey = {
   },
 };
 
-export const getCachedCurrentPosition = (): TPosition | null => {
+export const getMyPositionCache = (): TPosition | null => {
   try {
     const lat = localStorage.getItem(cacheKey.prevPosition.lat);
     const lgt = localStorage.getItem(cacheKey.prevPosition.lgt);
@@ -79,7 +79,7 @@ export const getCachedCurrentPosition = (): TPosition | null => {
   }
 };
 
-export const setCurrentPositionCache = (position: TPosition) => {
+export const setMyPositionCache = (position: TPosition) => {
   try {
     localStorage.setItem(
       cacheKey.prevPosition.lat,
