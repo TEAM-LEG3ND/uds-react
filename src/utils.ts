@@ -94,27 +94,6 @@ export const setMyPositionCache = (position: TPosition) => {
   }
 };
 
-export const abortify = <T>(
-  signal: AbortSignal,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  promiseFn: (...args: any[]) => Promise<T>
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): ((...args: any[]) => Promise<T>) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (...args: any[]) =>
-    new Promise<T>((resolve, reject) => {
-      if (signal.aborted) reject(signal.reason);
-
-      promiseFn(...args)
-        .then(resolve)
-        .catch(reject);
-
-      signal.addEventListener("abort", () => {
-        reject(signal.reason);
-      });
-    });
-};
-
 export const promisify = <T>(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fn: (...args: any[]) => void

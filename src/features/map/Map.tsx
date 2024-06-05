@@ -3,10 +3,11 @@ import { ReactNode, useEffect, useRef, useState } from "react";
 import { CENTER_OF_SEOUL } from "@/constants";
 import { getMyPositionAsync } from "@/effects/geolocation";
 import { MapProvider } from "@/features/map/MapProvider";
+import useAbortController from "@/hooks/use-abort-controller";
 import { TBoundary } from "@/models/map";
 import { Spinner } from "@/ui/loader";
 import Toast from "@/ui/toast";
-import { abortify, getMyPositionCache, setMyPositionCache } from "@/utils";
+import { getMyPositionCache, setMyPositionCache } from "@/utils";
 
 import classNames from "./Map.module.css";
 
@@ -22,7 +23,7 @@ function Map({ onInit, onChangeBounds, children, className }: MapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const onInitializeRef = useRef(onInit);
   const [isLoading, setIsLoading] = useState(false);
-  const abortControllerRef = useRef<AbortController | null>(null);
+  const { abort, abortify, reset: resetAbort } = useAbortController();
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -44,16 +45,11 @@ function Map({ onInit, onChangeBounds, children, className }: MapProps) {
 
   useEffect(() => {
     if (!kakaoMap) return;
-    abortControllerRef.current = new AbortController();
 
     const getMyPosition = async () => {
-      if (!abortControllerRef.current) return;
       try {
         setIsLoading(true);
-        const myPosition = await abortify(
-          abortControllerRef.current.signal,
-          getMyPositionAsync
-        )({
+        const myPosition = await abortify(getMyPositionAsync)({
           timeout: 10000,
         });
 
@@ -66,11 +62,11 @@ function Map({ onInit, onChangeBounds, children, className }: MapProps) {
         console.error(err);
       } finally {
         setIsLoading(false);
-        abortControllerRef.current = null;
+        resetAbort();
       }
     };
     getMyPosition();
-  }, [kakaoMap]);
+  }, [kakaoMap, abortify, resetAbort]);
 
   useEffect(() => {
     if (!kakaoMap) return;
@@ -87,7 +83,7 @@ function Map({ onInit, onChangeBounds, children, className }: MapProps) {
       };
 
       onChangeBounds(boundary);
-      abortControllerRef.current && abortControllerRef.current.abort();
+      abort("Abort getMyPosition:User interaction occured");
     };
 
     kakao.maps.event.addListener(kakaoMap, "idle", changeBoundsListener);
@@ -95,7 +91,7 @@ function Map({ onInit, onChangeBounds, children, className }: MapProps) {
     return () => {
       kakao.maps.event.removeListener(kakaoMap, "idle", changeBoundsListener);
     };
-  }, [kakaoMap, onChangeBounds]);
+  }, [kakaoMap, onChangeBounds, abort]);
 
   return (
     <div ref={containerRef} className={className}>
