@@ -48,6 +48,9 @@ export default function HomePage() {
         setSheetLayout("PREVIEW");
       } else if (visibility === 30) close();
     },
+    options: {
+      throttle: 24,
+    },
   });
   const { getSpotsBoundaryAsync } = useSpotsBoundaryAsyncQuery();
 
